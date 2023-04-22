@@ -12,10 +12,12 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.jainhardik120.macrokeyboard.ui.presentation.home.BottomBarScreen
-import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeNavGraph
+import com.jainhardik120.macrokeyboard.ui.presentation.root.BottomBarScreen
+import com.jainhardik120.macrokeyboard.ui.presentation.root.HomeNavGraph
 import com.jainhardik120.macrokeyboard.ui.theme.MacroKeyboardTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,11 +38,11 @@ class MainActivity : ComponentActivity() {
                     val currentDestination = navBackStackEntry?.destination
                     val bottomBarDestination = screens.any { it.route == currentDestination?.route }
                     Scaffold(
-                        topBar = {
-                            TopAppBar(title = {
-                                Text(text = "Macro Keys")
-                            })
-                        },
+//                        topBar = {
+//                            TopAppBar(title = {
+//                                Text(text = "Macro Keys")
+//                            })
+//                        },
                         bottomBar = {
 
                             NavigationBar {

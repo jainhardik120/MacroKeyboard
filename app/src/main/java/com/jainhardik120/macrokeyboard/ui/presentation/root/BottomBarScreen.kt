@@ -1,4 +1,4 @@
-package com.jainhardik120.macrokeyboard.ui.presentation.home
+package com.jainhardik120.macrokeyboard.ui.presentation.root
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
