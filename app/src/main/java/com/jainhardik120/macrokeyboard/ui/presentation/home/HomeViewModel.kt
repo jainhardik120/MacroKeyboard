@@ -37,47 +37,50 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun navigateSettings(){
-        sendUiEvent(UiEvent.Navigate(Screen.SettingsScreen.route))
-    }
-    fun navigateNewButton(){
-        sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs("0","0")))
-    }
-
     init {
         Log.d(TAG, "HomeViewModel: Initialized")
     }
 
-    fun loadCurrentScreen(){
-        viewModelScope.launch {
-            repository.getScreen(state.currentScreen).collect{
-                result->
-                when(result){
-                    is Resource.Loading->{
-
-                    }
-                    is Resource.Success->{
-                        state = result.data?.let { state.copy(screenEntities = it) }!!
-                    }
-                    is Resource.Error->{
-
-                    }
-                }
-            }
-        }
+    fun navigateNewButton(){
+        sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs("0","0")))
     }
 
 
     fun onEvent(event:HomeScreenEvent){
         when(event){
+            is HomeScreenEvent.OnSettingsButtonClicked->{
+                sendUiEvent(UiEvent.Navigate(Screen.SettingsScreen.route))
+            }
             is HomeScreenEvent.OnButtonClicked->{
-                Log.d(TAG, "onEvent: Button Clicked")
-                viewModelScope.launch {
-                    sendData("192.168.10.104", 9155, "Hello")
-                }
+                handleButtonPress(id = event.id)
+            }
+            is HomeScreenEvent.OnButtonLongClicked->{
+                handleLongButtonPress(id = event.id)
+            }
+            is HomeScreenEvent.BackPressed->{
+
             }
         }
     }
+
+    private fun handleButtonPress(id : Int){
+        if(id==state.screenEntities.size){
+            sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs(state.currentScreen.toString(), id.toString())))
+        } else {
+            if(state.screenEntities[id].type==0){
+                // Screen Type
+            } else {
+                // Button Type
+            }
+        }
+    }
+
+    private fun handleLongButtonPress(id : Int){
+        if(id!=state.screenEntities.size){
+            sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs(state.currentScreen.toString(), id.toString())))
+        }
+    }
+
     suspend fun sendData(ipAddress:String, port: Int, message: String){
         withContext(Dispatchers.IO) {
             val client = Socket(ipAddress, port)

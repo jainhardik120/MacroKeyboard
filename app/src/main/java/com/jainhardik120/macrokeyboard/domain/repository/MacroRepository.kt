@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MacroRepository {
 
-    fun getScreen(id: Int) : Flow<Resource<List<ScreenEntity>>>
+    suspend fun getScreen(id: Int) : List<ScreenEntity>
 
     fun getConnectionInfo():Pair<String, Int>
 

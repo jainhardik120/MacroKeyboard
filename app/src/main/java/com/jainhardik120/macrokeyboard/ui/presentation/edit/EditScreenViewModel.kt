@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jainhardik120.macrokeyboard.domain.model.Action
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
 import com.jainhardik120.macrokeyboard.ui.presentation.settings.SettingsState
 import com.jainhardik120.macrokeyboard.util.Screen
@@ -36,7 +37,7 @@ class EditScreenViewModel @Inject constructor(
             state = state.copy(screenId = screenId, childId = childId)
             val initialData = repository.getButtonDetails(screenId = screenId.toInt(), childId = childId.toInt())
             if (initialData != null) {
-                state = state.copy(label = initialData.label, type = initialData.type)
+                state = state.copy(label = initialData.label, type = initialData.type, newButton = false)
             }
             Log.d(TAG, "Initialize: ${state.toString()}")
         }
@@ -54,7 +55,16 @@ class EditScreenViewModel @Inject constructor(
             is EditButtonScreenEvent.SaveButtonClick->{
                 sendUiEvent(UiEvent.Navigate())
             }
-            else->{}
+            is EditButtonScreenEvent.NewActionButtonClick->{
+                val newActionsList = List(state.actions.size+1){
+                    if(it!=state.actions.size){
+                        state.actions[it]
+                    } else {
+                        Action(state.actions.size+1, 0, "")
+                    }
+                }
+                state = state.copy(actions = newActionsList)
+            }
         }
     }
 }
