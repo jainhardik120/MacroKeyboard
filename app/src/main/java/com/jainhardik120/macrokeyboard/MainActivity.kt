@@ -5,16 +5,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.jainhardik120.macrokeyboard.ui.presentation.root.BottomBarScreen
-import com.jainhardik120.macrokeyboard.ui.presentation.root.HomeNavGraph
+import androidx.navigation.navArgument
+import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditButtonScreen
+import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreen
+import com.jainhardik120.macrokeyboard.ui.presentation.settings.SettingsScreen
 import com.jainhardik120.macrokeyboard.ui.theme.MacroKeyboardTheme
+import com.jainhardik120.macrokeyboard.util.Screen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -29,42 +30,34 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val screens = listOf(
-                        BottomBarScreen.Home,
-                        BottomBarScreen.Settings
-                    )
-                    val navController: NavHostController = rememberNavController()
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
-                    val currentDestination = navBackStackEntry?.destination
-                    val bottomBarDestination = screens.any { it.route == currentDestination?.route }
-                    Scaffold(
-//                        topBar = {
-//                            TopAppBar(title = {
-//                                Text(text = "Macro Keys")
-//                            })
-//                        },
-                        bottomBar = {
-
-                            NavigationBar {
-                                screens.forEachIndexed { index, screen ->
-                                    NavigationBarItem(
-                                        icon = { Icon(screen.icon, contentDescription = screen.title) },
-                                        label = { Text(screen.title) },
-                                        selected = currentDestination?.hierarchy?.any {
-                                            it.route == screen.route
-                                        } == true,
-                                        onClick = {
-                                            navController.navigate(screen.route){
-                                                popUpTo(navController.graph.findStartDestination().id)
-                                                launchSingleTop = true
-                                            }
-                                        }
-                                    )
-                                }
-                            }
+                    val navController = rememberNavController()
+                    NavHost(navController = navController, startDestination = Screen.HomeScreen.route){
+                        composable(route = Screen.HomeScreen.route){
+                            HomeScreen(onNavigate = {
+                                it.route?.let { it1 -> navController.navigate(it1) }
+                            })
                         }
-                    ) {
-                        HomeNavGraph(navController = navController, paddingValues = it)
+                        composable(route = Screen.SettingsScreen.route){
+                            SettingsScreen(onNavigate = {
+                                navController.navigateUp()
+                            })
+                        }
+                        composable(route = Screen.EditScreen.route + "/{screenId}/{childId}",
+                        arguments = listOf(
+                            navArgument("screenId"){
+                                type = NavType.StringType
+                                nullable = false
+                            },
+                            navArgument("childId"){
+                                type = NavType.StringType
+                                nullable = false
+                            }
+                        )
+                        ){
+                            EditButtonScreen(onNavigate = {
+                                navController.navigateUp()
+                            })
+                        }
                     }
                 }
             }

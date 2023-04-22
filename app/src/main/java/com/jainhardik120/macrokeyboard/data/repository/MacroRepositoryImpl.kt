@@ -23,4 +23,20 @@ class MacroRepositoryImpl @Inject constructor(
         val screenData = dao.getScreenInfo(id)
         emit(Resource.Success(screenData))
     }
+
+    override fun getConnectionInfo(): Pair<String, Int> {
+        return Pair(sharedPreferences.getString("ipAddress", "192.168.10.104")!!, sharedPreferences.getInt("port", 9155))
+    }
+
+    override fun updatePortInfo(updatedValues: Pair<String, Int>) {
+        with(sharedPreferences.edit()){
+            putString("ipAddress", updatedValues.first)
+            putInt("port", updatedValues.second)
+            apply()
+        }
+    }
+
+    override suspend fun getButtonDetails(screenId: Int, childId: Int): ScreenEntity? {
+        return dao.getButtonInfo(parentId = screenId, childId = childId)
+    }
 }

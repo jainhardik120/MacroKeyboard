@@ -8,9 +8,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
 import com.jainhardik120.macrokeyboard.util.Resource
+import com.jainhardik120.macrokeyboard.util.Screen
+import com.jainhardik120.macrokeyboard.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.PrintWriter
@@ -23,6 +27,26 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel(){
     var state by mutableStateOf(HomeState())
     private val TAG = "HomeViewModel"
+
+    private val _uiEvent =  Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
+
+    private fun sendUiEvent(event: UiEvent) {
+        viewModelScope.launch {
+            _uiEvent.send(event)
+        }
+    }
+
+    fun navigateSettings(){
+        sendUiEvent(UiEvent.Navigate(Screen.SettingsScreen.route))
+    }
+    fun navigateNewButton(){
+        sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs("0","0")))
+    }
+
+    init {
+        Log.d(TAG, "HomeViewModel: Initialized")
+    }
 
     fun loadCurrentScreen(){
         viewModelScope.launch {

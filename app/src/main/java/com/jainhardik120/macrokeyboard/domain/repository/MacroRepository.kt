@@ -8,4 +8,10 @@ import kotlinx.coroutines.flow.Flow
 interface MacroRepository {
 
     fun getScreen(id: Int) : Flow<Resource<List<ScreenEntity>>>
+
+    fun getConnectionInfo():Pair<String, Int>
+
+    fun updatePortInfo(updatedValues: Pair<String, Int>)
+
+    suspend fun getButtonDetails(screenId: Int, childId: Int):ScreenEntity?=null
 }
