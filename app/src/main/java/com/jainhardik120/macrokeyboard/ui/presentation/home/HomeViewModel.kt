@@ -7,8 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
+import com.jainhardik120.macrokeyboard.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.PrintWriter
@@ -21,6 +23,27 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel(){
     var state by mutableStateOf(HomeState())
     private val TAG = "HomeViewModel"
+
+    fun loadCurrentScreen(){
+        viewModelScope.launch {
+            repository.getScreen(state.currentScreen).collect{
+                result->
+                when(result){
+                    is Resource.Loading->{
+
+                    }
+                    is Resource.Success->{
+                        state = result.data?.let { state.copy(screenEntities = it) }!!
+                    }
+                    is Resource.Error->{
+
+                    }
+                }
+            }
+        }
+    }
+
+
     fun onEvent(event:HomeScreenEvent){
         when(event){
             is HomeScreenEvent.OnButtonClicked->{
