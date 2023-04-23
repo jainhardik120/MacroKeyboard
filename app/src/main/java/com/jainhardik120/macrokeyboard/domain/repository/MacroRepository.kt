@@ -26,4 +26,7 @@ interface MacroRepository {
 
     suspend fun addAction(action:ActionEntity)
     suspend fun addButton(screen:ScreenEntity):Long
+
+    suspend fun deleteAction(id: Int, sno:Int)
+    suspend fun deleteButton(childId: Int)
 }

@@ -38,5 +38,9 @@ interface MacroDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertButton(screenEntity: ScreenEntity):Long
 
+    @Query("DELETE FROM actions_table WHERE id = :id AND sno = :sno")
+    suspend fun deleteAction(sno: Int, id:Int)
 
+    @Query("DELETE FROM screen_table WHERE childId = :childId")
+    suspend fun deleteButton(childId: Int)
 }

@@ -133,7 +133,34 @@ class EditScreenViewModel @Inject constructor(
                         )
                     )
                 }
-                else -> {}
+                EditButtonScreenEvent.BackPressed -> TODO()
+                EditButtonScreenEvent.DeleteClicked -> {
+                    if (state.newButton){
+                        if(state.list.isNotEmpty()){
+                            for (i in state.list){
+                                repository.deleteAction(i.id, i.sno)
+                            }
+                        }
+                        if(state.childId!=""){
+                            repository.deleteButton(state.childId.toInt())
+                        }
+                        sendUiEvent(UiEvent.Navigate())
+                    }else{
+                        if(state.type==0){
+                            repository.deleteButton(state.childId.toInt())
+                            sendUiEvent(UiEvent.Navigate())
+                        } else {
+                            if(state.list.isNotEmpty()){
+                                for (i in state.list){
+                                    repository.deleteAction(i.id, i.sno)
+                                }
+                            }
+                            repository.deleteButton(state.childId.toInt())
+                            sendUiEvent(UiEvent.Navigate())
+
+                        }
+                    }
+                }
             }
         }
     }

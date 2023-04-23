@@ -69,15 +69,14 @@ fun EditButtonScreen(
                     .padding(16.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
-            Row() {
-                if (state.childId.isNotEmpty()) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                if((state.newButton && state.childId.isNotEmpty())||(!state.newButton && state.type==1)){
                     Button(
                         onClick = { viewModel.onEvent(EditButtonScreenEvent.NewActionButtonClick) }
                     ) {
                         Text(text = "Add New Action")
                     }
                 }
-                Spacer(modifier = Modifier.width(4.dp))
                 Button(
                     onClick = { viewModel.onEvent(EditButtonScreenEvent.SaveButtonClick) }
                 ) {
@@ -87,7 +86,15 @@ fun EditButtonScreen(
                         Text(text = "Create Button")
                     }
                 }
+                Button(onClick = {viewModel.onEvent(EditButtonScreenEvent.DeleteClicked)}){
+                    if(state.newButton){
+                        Text(text = "Cancel")
+                    }else{
+                        Text(text = "Delete Button")
+                    }
+                }
             }
+            Spacer(modifier = Modifier.height(4.dp))
             LazyColumn {
                 items(state.list.size) {
                     Card(
@@ -96,25 +103,19 @@ fun EditButtonScreen(
                             .padding(horizontal = 16.dp, vertical = 4.dp)
                     ) {
                         Row() {
-                            Column() {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(text = state.list[it].type.toString())
                                 Text(text = state.list[it].data.toString())
                             }
-                            Surface(
-                                Modifier
-                                    .size(36.dp)
-                                    .combinedClickable(
-                                        onClick = {
-                                            viewModel.onEvent(
-                                                EditButtonScreenEvent.EditButtonClicked(
-                                                    it
-                                                )
-                                            )
-                                        }
-                                    )) {
+                            IconButton(onClick = {
+                                viewModel.onEvent(
+                                    EditButtonScreenEvent.EditButtonClicked(
+                                        it
+                                    )
+                                )
+                            }) {
                                 Icon(Icons.Filled.Edit, contentDescription = "Edit Button")
                             }
-
                         }
 
 

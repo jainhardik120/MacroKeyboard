@@ -40,6 +40,14 @@ class MacroRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteAction(id: Int, sno: Int) {
+        dao.deleteAction(sno, id)
+    }
+
+    override suspend fun deleteButton(childId: Int) {
+        dao.deleteButton(childId)
+    }
+
     override suspend fun getButtonDetails(childId: Int): ScreenEntity? {
         return dao.getButtonInfo(childId = childId)
     }

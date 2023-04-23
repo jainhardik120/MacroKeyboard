@@ -134,6 +134,7 @@ public class Server {
     }
 
     public static void main(String[] args) {
+        printTitle();
         keyMap.put('!', '1');
         keyMap.put('@', '2');
         keyMap.put('#', '3');
@@ -162,6 +163,7 @@ public class Server {
         commandKeys.put("Right", KeyEvent.VK_RIGHT);
         commandKeys.put("Up", KeyEvent.VK_UP);
         commandKeys.put("Down", KeyEvent.VK_DOWN);
+        commandKeys.put("Enter", KeyEvent.VK_ENTER);
         commandKeys.put("Alt", KeyEvent.VK_ALT);
         commandKeys.put("F1", KeyEvent.VK_F1);
         commandKeys.put("F2", KeyEvent.VK_F2);
@@ -205,6 +207,8 @@ public class Server {
                     mouseMove(jsonObject.getString("data"), robot);
                 } else if (jsonObject.get("type").equals("4")) {
                     mouseClick(jsonObject.getString("data"), robot);
+                } else if(jsonObject.get("type").equals("5")){
+                    sleep(Long.parseLong(jsonObject.getString("data")));
                 }
             } catch (IOException | JSONException | AWTException e) {
                 e.printStackTrace();

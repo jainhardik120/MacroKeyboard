@@ -79,7 +79,6 @@ class HomeViewModel @Inject constructor(
                     for (i in list){
                         val dataObject = "{\"type\":\"${i.type}\",\"data\":\"${i.data}\"}"
                         withContext(Dispatchers.IO) {
-                            Thread.sleep(100)
                             sendData(dataObject)
                         }
 
