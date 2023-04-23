@@ -7,7 +7,17 @@ In addition to basic text input, Macro Keys also allows you to configure it to s
 
 Another exciting feature of Macro Keys is the ability to control mouse input from the application. You can effortlessly move the mouse to any given coordinates on the screen, press a mouse button, and even enter text.
 
-Overall, Macro Keys is a powerful tool that can enhance your productivity and streamline your workflow. It is ideal for anyone who desires an external control device that is both efficient and easy to use.\
+Overall, Macro Keys is a powerful tool that can enhance your productivity and streamline your workflow. It is ideal for anyone who desires an external control device that is both efficient and easy to use.
+
+![image](https://user-images.githubusercontent.com/93935536/233855650-0b1f5580-45ab-4fb2-8ce0-0178983c8bf2.png)
+![Screenshot_20230423-230945_Macro Keyboard](https://user-images.githubusercontent.com/93935536/233855828-4c47eb45-97f1-4250-bae8-70f29002ae25.jpg)
+![Screenshot_20230423-231039_Macro Keyboard](https://user-images.githubusercontent.com/93935536/233855910-eebcf513-76ba-4eb1-adfb-bc0d118a4ce5.jpg)
+![Screenshot_20230423-231003_Macro Keyboard](https://user-images.githubusercontent.com/93935536/233855836-b7093dbe-5e9d-4416-9309-2d90241daa26.jpg)
+![Screenshot_20230423-231012_Macro Keyboard](https://user-images.githubusercontent.com/93935536/233855842-76479ed1-e6c2-4e06-b24b-1e13bba7c3e0.jpg)
+![Screenshot_20230423-231029_Macro Keyboard](https://user-images.githubusercontent.com/93935536/233855850-b3349bf8-a5a2-44ab-a68a-0a36244febdc.jpg)
+![Screenshot_20230423-231039_Macro Keyboard](https://user-images.githubusercontent.com/93935536/233855858-e8483b66-8ee6-4f68-b619-08ef49b74aa4.jpg)
+
+
 
 ## Steps to use
 * Setup the java project found in reciever folder, and run the Server.java class in the java compiler.
