@@ -1,6 +1,5 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.home
 
-import android.media.midi.MidiDeviceInfo.PortInfo
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,17 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jainhardik120.macrokeyboard.data.local.entity.ScreenEntity
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
-import com.jainhardik120.macrokeyboard.util.Resource
 import com.jainhardik120.macrokeyboard.util.Screen
 import com.jainhardik120.macrokeyboard.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 import java.io.PrintWriter
 import java.net.Socket
 import javax.inject.Inject
@@ -82,7 +78,11 @@ class HomeViewModel @Inject constructor(
                     Log.d(TAG, "handleButtonPress: ${list.size}")
                     for (i in list){
                         val dataObject = "{\"type\":\"${i.type}\",\"data\":\"${i.data}\"}"
-                        sendData(dataObject)
+                        withContext(Dispatchers.IO) {
+                            Thread.sleep(100)
+                            sendData(dataObject)
+                        }
+
                     }
                 }
             }

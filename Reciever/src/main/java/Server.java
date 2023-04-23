@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,12 +18,17 @@ public class Server {
     private static InputStreamReader inputStreamReader;
     private static BufferedReader bufferedReader;
     private static String string;
+    private static HashMap<Character, Character> keyMap = new HashMap<>();
+    private static HashMap<String, Integer> commandKeys = new HashMap<>();
 
     public static void sleep(long ms) {
-        try {Thread.sleep(ms);} catch (Exception ignored) {}
+        try {
+            Thread.sleep(ms);
+        } catch (Exception ignored) {
+        }
     }
 
-    public static void printTitle(){
+    public static void printTitle() {
         System.out.println("                  .----.");
         System.out.println("      .---------. | == |");
         System.out.println(
@@ -41,61 +47,141 @@ public class Server {
         System.out.println("   `\"\"\"\"\"\"\"\"\"\"\"\"\"`  '-'");
     }
 
-    public static void func(String s1) throws IOException,
-            AWTException, InterruptedException {
-        HashMap<String, Integer> Key2 = new HashMap<String, Integer>();
-        Key2.put("(", 0x5B);
-        Key2.put("\\", 0x5C);
-        Key2.put(")", 0x5D);
-        Key2.put("+", 0x6B);
-        Key2.put(".", 0x6C);
-        Key2.put("-", 0x6D);
-        Key2.put("/", 0x6F);
-        Key2.put("&", 0x96);
-        Key2.put("*", 0x97);
-        Key2.put("\"", 0x98);
-        Key2.put("<", 0x99);
-        Key2.put(">", 0xa0);
-        Key2.put("{", 0xa1);
-        Key2.put("}", 0xa2);
-        Key2.put("@", 0x0200);
-        Key2.put(":", 0x0201);
-        Key2.put("^", 0x0202);
-        Key2.put("$", 0x0202);
-        Key2.put("€", 0x0204);
-        Key2.put("!", 0x0205);
-        Key2.put("#", 0x0205);
-        Key2.put("_", 0x020B);
-        Robot r = new Robot();
-        for (int i = 0; i < s1.length(); i++) {
-            if ((s1.charAt(i) >= 48 && s1.charAt(i) <= 57) || (s1.charAt(i) >= 65 && s1.charAt(i) <= 90)
-                    || (s1.charAt(i) >= 97 && s1.charAt(i) <= 122) || s1.charAt(i)==' ') {
-                if (Character.isUpperCase(s1.charAt(i))) {
-                    robot.keyPress(KeyEvent.VK_SHIFT);
-                    robot.keyPress(Character.toUpperCase(s1.charAt(i)));
-                    robot.keyRelease(KeyEvent.VK_SHIFT);
-                } else {
-                    robot.keyPress(Character.toUpperCase(s1.charAt(i)));
+    public static void textOutput(String s, Robot robot){
+        try{
+            for (char letter : s.toCharArray()) {
+                boolean shiftRequired = false;
+                Character value = keyMap.get(letter);
+                if (value != null) {
+                    shiftRequired = true;
+                    letter = value;
+                } else if (Character.isUpperCase(letter)) {
+                    shiftRequired = true;
                 }
-            } else {
-                String x = "";
-                x += s1.charAt(i);
-                if (Key2.containsKey(x)) {
-                    r.keyPress(Key2.get(x));
-                }
+                int keyCode = KeyEvent.getExtendedKeyCodeForChar(letter);
+                if (shiftRequired)
+                    robot.keyPress(java.awt.event.KeyEvent.VK_SHIFT);
+                robot.keyPress(keyCode);
+                robot.keyRelease(keyCode);
+                if (shiftRequired)
+                    robot.keyRelease(java.awt.event.KeyEvent.VK_SHIFT);
             }
-            Thread.sleep(20);
+        }catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
 
+    }
+
+    public static void keyCombos(String s, Robot robot){
+        String[] list = s.split(",");
+        for (int i = 0; i < list.length; i++){
+            try{
+                if(commandKeys.get(list[i])!=null){
+                    int keyCode = commandKeys.get(list[i]);
+                    robot.keyPress(keyCode);
+                } else if (list[i].length()==1) {
+                    if(Character.isAlphabetic(list[i].charAt(0)) || Character.isDigit(list[i].charAt(0))){
+                        int keyCode = KeyEvent.getExtendedKeyCodeForChar(list[i].charAt(0));
+                        robot.keyPress(keyCode);
+                    }
+                }
+            }catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }
+        }
+        for (int i = list.length-1; i > -1; i--){
+            try{
+                if(commandKeys.get(list[i])!=null){
+                    int keyCode = commandKeys.get(list[i]);
+                    robot.keyRelease(keyCode);
+                } else if (list[i].length()==1) {
+                    if(Character.isAlphabetic(list[i].charAt(0)) || Character.isDigit(list[i].charAt(0))){
+                        int keyCode = KeyEvent.getExtendedKeyCodeForChar(list[i].charAt(0));
+                        robot.keyRelease(keyCode);
+                    }
+                }
+            }catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }
+        }
+    }
+    public static void mouseMove(String s, Robot robot){
+        String[] list = s.split(",");
+        if(list.length==2){
+            try{
+                int x = Integer.parseInt(list[0]);
+                int y = Integer.parseInt(list[1]);
+                robot.mouseMove(x,y);
+            }catch (NumberFormatException e){
+                e.printStackTrace();
+            }
+        }
+    }
+    public static void mouseClick(String s, Robot robot){
+        if(s.equals("left")){
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            sleep(5);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        } else if (s.equals("middle")) {
+            robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
+            sleep(5);
+            robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+        } else if (s.equals("right")) {
+            robot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
+            sleep(5);
+            robot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
         }
     }
 
     public static void main(String[] args) {
+        keyMap.put('!', '1');
+        keyMap.put('@', '2');
+        keyMap.put('#', '3');
+        keyMap.put('$', '4');
+        keyMap.put('%', '5');
+        keyMap.put('^', '6');
+        keyMap.put('&', '7');
+        keyMap.put('*', '8');
+        keyMap.put('(', '9');
+        keyMap.put(')', '0');
+        keyMap.put('{', '[');
+        keyMap.put('}', ']');
+        keyMap.put(':', ';');
+        keyMap.put('"', '\'');
+        keyMap.put('<', ',');
+        keyMap.put('>', '.');
+        keyMap.put('?', '/');
+        keyMap.put('_', '-');
+        keyMap.put('+', '=');
+        keyMap.put('|', '\\');
+
+        commandKeys.put("Ctrl", KeyEvent.VK_CONTROL);
+        commandKeys.put("Win", KeyEvent.VK_WINDOWS);
+        commandKeys.put("Shift", KeyEvent.VK_SHIFT);
+        commandKeys.put("Left", KeyEvent.VK_LEFT);
+        commandKeys.put("Right", KeyEvent.VK_RIGHT);
+        commandKeys.put("Up", KeyEvent.VK_UP);
+        commandKeys.put("Down", KeyEvent.VK_DOWN);
+        commandKeys.put("Alt", KeyEvent.VK_ALT);
+        commandKeys.put("F1", KeyEvent.VK_F1);
+        commandKeys.put("F2", KeyEvent.VK_F2);
+        commandKeys.put("F3", KeyEvent.VK_F3);
+        commandKeys.put("F4", KeyEvent.VK_F4);
+        commandKeys.put("F5", KeyEvent.VK_F5);
+        commandKeys.put("F6", KeyEvent.VK_F6);
+        commandKeys.put("F7", KeyEvent.VK_F7);
+        commandKeys.put("F8", KeyEvent.VK_F8);
+        commandKeys.put("F9", KeyEvent.VK_F9);
+        commandKeys.put("F10", KeyEvent.VK_F10);
+        commandKeys.put("F11", KeyEvent.VK_F11);
+        commandKeys.put("F12", KeyEvent.VK_F12);
         try {
             InetAddress localhost = InetAddress.getLocalHost();
+            robot = new Robot();
             System.out.println("System IP Address : " +
                     (localhost.getHostAddress()).trim());
             serverSocket = new ServerSocket(9155);
-            robot = new Robot();
+
             System.out.println("Listening on 9155");
         } catch (IOException | AWTException e) {
             throw new RuntimeException(e);
@@ -105,22 +191,23 @@ public class Server {
                 socket = serverSocket.accept();
                 inputStreamReader = new InputStreamReader(socket.getInputStream());
                 bufferedReader = new BufferedReader(inputStreamReader);
+                robot = new Robot();
                 string = bufferedReader.readLine();
                 if (string.equals("Over")) {
                     break;
                 }
                 JSONObject jsonObject = new JSONObject(string);
                 if (jsonObject.get("type").equals("1")) {
-                    func(jsonObject.get("data").toString());
-                } else if (jsonObject.get("type").equals("2")){
-
+                    textOutput(jsonObject.getString("data"), robot);
+                } else if (jsonObject.get("type").equals("2")) {
+                    keyCombos(jsonObject.getString("data"), robot);
                 } else if (jsonObject.get("type").equals("3")) {
-
+                    mouseMove(jsonObject.getString("data"), robot);
                 } else if (jsonObject.get("type").equals("4")) {
-
+                    mouseClick(jsonObject.getString("data"), robot);
                 }
-            } catch (IOException | JSONException | InterruptedException | AWTException e) {
-                throw new RuntimeException(e);
+            } catch (IOException | JSONException | AWTException e) {
+                e.printStackTrace();
             }
 
         }
