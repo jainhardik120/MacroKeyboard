@@ -66,6 +66,7 @@ class ActionEditViewModel @Inject constructor(
                     state.copy(actionType = -1)
                 }
             }
+            else -> {}
         }
     }
 }

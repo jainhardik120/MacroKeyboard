@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.io.PrintWriter
 import java.net.Socket
 import javax.inject.Inject
@@ -33,8 +34,6 @@ class HomeViewModel @Inject constructor(
     private val _uiEvent =  Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    var portInfo = Pair("", 0)
-
 
     val screenInfo = repository.getScreen(state.currentScreen)
 
@@ -46,7 +45,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         Log.d(TAG, "HomeViewModel: Initialized")
-        portInfo = repository.getConnectionInfo()
+
     }
 
 
@@ -82,7 +81,8 @@ class HomeViewModel @Inject constructor(
                 if (list != null) {
                     Log.d(TAG, "handleButtonPress: ${list.size}")
                     for (i in list){
-                        sendData(i.data)
+                        val dataObject = "{\"type\":\"${i.type}\",\"data\":\"${i.data}\"}"
+                        sendData(dataObject)
                     }
                 }
             }
@@ -94,12 +94,19 @@ class HomeViewModel @Inject constructor(
 
     suspend fun sendData(message: String){
         withContext(Dispatchers.IO) {
-            val client = Socket(portInfo.first, portInfo.second)
-            val printWriter = PrintWriter(client.getOutputStream(), true)
-            printWriter.write(message)
-            printWriter.flush()
-            printWriter.close()
-            client.close()
+            try{
+                val portInfo = repository.getConnectionInfo()
+                val client = Socket(portInfo.first, portInfo.second)
+                val printWriter = PrintWriter(client.getOutputStream(), true)
+                printWriter.write(message)
+                printWriter.flush()
+                printWriter.close()
+                client.close()
+            } catch (e:Exception){
+//                Log.d(TAG, "sendData: ${e.message}")
+                e.message?.let { UiEvent.ShowSnackbar(it) }?.let { sendUiEvent(it) }
+            }
+            
         }
     }
 }

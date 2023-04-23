@@ -1,5 +1,6 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.settings
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreenEvent
 import com.jainhardik120.macrokeyboard.util.UiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,6 +32,9 @@ fun SettingsScreen(
                 }
             }
         }
+    }
+    BackHandler(enabled = true) {
+        viewModel.onEvent(SettingsScreenEvent.BackPressed)
     }
     Scaffold(snackbarHost = {SnackbarHost(hostState = snackbarHostState)}) {
         Column(Modifier.fillMaxSize().padding(it),

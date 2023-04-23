@@ -6,10 +6,13 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jainhardik120.macrokeyboard.util.UiEvent
@@ -36,46 +39,63 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
     BackHandler(enabled = true) {
         viewModel.onEvent(HomeScreenEvent.BackPressed)
     }
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(
+            title = {
+                Text("Macro Keys", maxLines = 1, overflow = TextOverflow.Ellipsis)
+            },actions = {
+                IconButton(onClick = { viewModel.onEvent(HomeScreenEvent.OnSettingsButtonClicked) }) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Settings"
+                    )
+                }
+            }
+        )
+    }, snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(it)
         ) {
-            Button(onClick = { viewModel.onEvent(HomeScreenEvent.OnSettingsButtonClicked) }) {
-                Text(text = "Settings")
-            }
             LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 96.dp)) {
-                itemsIndexed(screenInfo.value) { index, item ->
-                    androidx.compose.material.Surface(
-                        modifier = Modifier.combinedClickable(
-                            onClick = {
-                                viewModel.onEvent(HomeScreenEvent.OnButtonClicked(item))
-                            },
-                            enabled = true,
-                            onLongClick = {
-                                viewModel.onEvent(HomeScreenEvent.OnButtonLongClicked(item))
+                items(screenInfo.value.size+1) { index ->
+                    if(index==screenInfo.value.size){
+                        androidx.compose.material.Surface(
+                            modifier = Modifier.combinedClickable(
+                                onClick = {
+                                    viewModel.onEvent(HomeScreenEvent.OnNewButtonClicked)
+                                },
+                                enabled = true
+                            ).padding(8.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer
+                        ) {
+                            Column(modifier = Modifier.size(96.dp), verticalArrangement = Arrangement.SpaceAround) {
+                                Text(text = "New", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
                             }
-                        ).size(96.dp)
-                    ) {
-                        Column(Modifier.size(96.dp)) {
-                            Text(text = item.label)
+                        }
+                    }else{
+                        androidx.compose.material.Surface(
+                            modifier = Modifier.combinedClickable(
+                                onClick = {
+                                    viewModel.onEvent(HomeScreenEvent.OnButtonClicked(screenInfo.value[index]))
+                                },
+                                enabled = true,
+                                onLongClick = {
+                                    viewModel.onEvent(HomeScreenEvent.OnButtonLongClicked(screenInfo.value[index]))
+                                }
+                            ).padding(8.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer
+                        ) {
+                            Column(modifier = Modifier.size(96.dp), verticalArrangement = Arrangement.SpaceAround) {
+                                Text(text = screenInfo.value[index].label, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                            }
                         }
                     }
                 }
+
             }
-            androidx.compose.material.Surface(
-                modifier = Modifier.combinedClickable(
-                    onClick = {
-                        viewModel.onEvent(HomeScreenEvent.OnNewButtonClicked)
-                    },
-                    enabled = true
-                )
-            ) {
-                Column(Modifier.size(96.dp)) {
-                    Text(text = "New")
-                }
-            }
+
         }
     }
 }

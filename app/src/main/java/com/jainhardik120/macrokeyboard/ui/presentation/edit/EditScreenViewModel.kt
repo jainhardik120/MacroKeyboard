@@ -52,7 +52,7 @@ class EditScreenViewModel @Inject constructor(
                         newButton = false
                     )
                 }
-                repository.getActions(childId.toInt()).collect{
+                repository.getActions(childId.toInt()).collect {
                     state = state.copy(list = it)
                 }
             }
@@ -71,17 +71,25 @@ class EditScreenViewModel @Inject constructor(
             when (event) {
                 is EditButtonScreenEvent.SaveButtonClick -> {
                     if (state.childId.isNotEmpty()) {
-                        if(state.label.isNotEmpty()){
+                        if (state.label.isNotEmpty()) {
                             repository.addButton(
                                 ScreenEntity(
                                     parentId = state.screenId.toInt(),
                                     childId = state.childId.toInt(),
                                     label = state.label,
-                                    type = state.type
+                                    type = if (state.newButton) {
+                                        if (state.list.isNotEmpty()) {
+                                            1
+                                        } else {
+                                            0
+                                        }
+                                    } else {
+                                        state.type
+                                    }
                                 )
                             )
                             sendUiEvent(UiEvent.Navigate())
-                        }else{
+                        } else {
                             sendUiEvent(UiEvent.ShowSnackbar("Name can't be Empty"))
                         }
                     } else {
@@ -94,20 +102,38 @@ class EditScreenViewModel @Inject constructor(
                                 )
                             )
                             state = state.copy(childId = childId.toString())
-                        }else{
+                            repository.getActions(childId.toInt()).collect {
+                                state = state.copy(list = it)
+                            }
+                        } else {
                             sendUiEvent(UiEvent.ShowSnackbar("Name can't be Empty"))
                         }
                     }
                 }
                 is EditButtonScreenEvent.NewActionButtonClick -> {
-                    sendUiEvent(UiEvent.Navigate(Screen.EditActionScreen.withArgs(state.childId, (state.list.size+1).toString())))
+                    sendUiEvent(
+                        UiEvent.Navigate(
+                            Screen.EditActionScreen.withArgs(
+                                state.childId,
+                                (state.list.size + 1).toString()
+                            )
+                        )
+                    )
                 }
                 is EditButtonScreenEvent.ButtonNameChanged -> {
                     state = state.copy(label = event.string)
                 }
                 is EditButtonScreenEvent.EditButtonClicked -> {
-                    sendUiEvent(UiEvent.Navigate(Screen.EditActionScreen.withArgs(state.childId, (state.list[event.id].sno).toString())))
+                    sendUiEvent(
+                        UiEvent.Navigate(
+                            Screen.EditActionScreen.withArgs(
+                                state.childId,
+                                (state.list[event.id].sno).toString()
+                            )
+                        )
+                    )
                 }
+                else -> {}
             }
         }
     }

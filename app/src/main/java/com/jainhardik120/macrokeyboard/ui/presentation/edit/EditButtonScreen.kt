@@ -1,6 +1,7 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.edit
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
+import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreenEvent
 import com.jainhardik120.macrokeyboard.ui.presentation.settings.SettingsScreenEvent
 import com.jainhardik120.macrokeyboard.util.UiEvent
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -44,6 +46,9 @@ fun EditButtonScreen(
                 }
             }
         }
+    }
+    BackHandler(enabled = true) {
+        viewModel.onEvent(EditButtonScreenEvent.BackPressed)
     }
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
         Column(

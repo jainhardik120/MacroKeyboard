@@ -1,6 +1,7 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.action
 
 import android.app.Notification.Action
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -11,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditButtonScreenEvent
 import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditScreenViewModel
+import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreenEvent
 import com.jainhardik120.macrokeyboard.util.UiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,6 +31,9 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 }
             }
         }
+    }
+    BackHandler(enabled = true) {
+        viewModel.onEvent(ActionEditScreenEvent.BackPressed)
     }
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
         Column(
