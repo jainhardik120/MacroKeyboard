@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jainhardik120.macrokeyboard.data.local.entity.ScreenEntity
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
 import com.jainhardik120.macrokeyboard.util.Resource
 import com.jainhardik120.macrokeyboard.util.Screen
@@ -31,6 +32,8 @@ class HomeViewModel @Inject constructor(
     private val _uiEvent =  Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
+    val screenInfo = repository.getScreen(state.currentScreen)
+
     private fun sendUiEvent(event: UiEvent) {
         viewModelScope.launch {
             _uiEvent.send(event)
@@ -52,33 +55,22 @@ class HomeViewModel @Inject constructor(
                 sendUiEvent(UiEvent.Navigate(Screen.SettingsScreen.route))
             }
             is HomeScreenEvent.OnButtonClicked->{
-                handleButtonPress(id = event.id)
+                handleButtonPress(event.screenEntity)
             }
             is HomeScreenEvent.OnButtonLongClicked->{
-                handleLongButtonPress(id = event.id)
+                sendUiEvent(UiEvent.Navigate("${Screen.EditScreen.route}/${state.currentScreen.toString()}?childId=${event.screenEntity.childId.toString()}"))
             }
             is HomeScreenEvent.BackPressed->{
 
             }
-        }
-    }
-
-    private fun handleButtonPress(id : Int){
-        if(id==state.screenEntities.size){
-            sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs(state.currentScreen.toString(), id.toString())))
-        } else {
-            if(state.screenEntities[id].type==0){
-                // Screen Type
-            } else {
-                // Button Type
+            HomeScreenEvent.OnNewButtonClicked -> {
+                sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs(state.currentScreen.toString())))
             }
         }
     }
 
-    private fun handleLongButtonPress(id : Int){
-        if(id!=state.screenEntities.size){
-            sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs(state.currentScreen.toString(), id.toString())))
-        }
+    private fun handleButtonPress(screenEntity: ScreenEntity){
+
     }
 
     suspend fun sendData(ipAddress:String, port: Int, message: String){

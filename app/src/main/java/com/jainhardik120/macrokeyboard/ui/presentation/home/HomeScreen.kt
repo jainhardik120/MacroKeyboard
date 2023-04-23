@@ -6,6 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -18,6 +19,7 @@ import com.jainhardik120.macrokeyboard.util.UiEvent
 fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel = hiltViewModel()) {
     val TAG = "HomeScreen"
     val state = viewModel.state
+    val screenInfo = viewModel.screenInfo.collectAsState(initial = emptyList())
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {
@@ -44,22 +46,34 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                 Text(text = "Settings")
             }
             LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 48.dp)) {
-                items(viewModel.state.screenEntities.size + 1) { it ->
+                itemsIndexed(screenInfo.value) { index, item ->
                     androidx.compose.material.Surface(
                         modifier = Modifier.combinedClickable(
                             onClick = {
-                                viewModel.onEvent(HomeScreenEvent.OnButtonClicked(it))
+                                viewModel.onEvent(HomeScreenEvent.OnButtonClicked(item))
                             },
                             enabled = true,
                             onLongClick = {
-                                viewModel.onEvent(HomeScreenEvent.OnButtonLongClicked(it))
+                                viewModel.onEvent(HomeScreenEvent.OnButtonLongClicked(item))
                             }
                         )
                     ) {
                         Column(Modifier.size(28.dp)) {
-                            Text(text = if (it == state.screenEntities.size) "New" else state.screenEntities[it].label)
+                            Text(text = item.label)
                         }
                     }
+                }
+            }
+            androidx.compose.material.Surface(
+                modifier = Modifier.combinedClickable(
+                    onClick = {
+                        viewModel.onEvent(HomeScreenEvent.OnNewButtonClicked)
+                    },
+                    enabled = true
+                )
+            ) {
+                Column(Modifier.size(28.dp)) {
+                    Text(text = "New")
                 }
             }
         }

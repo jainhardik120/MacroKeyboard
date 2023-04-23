@@ -1,9 +1,12 @@
 package com.jainhardik120.macrokeyboard.data.repository
 
 import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
 import com.jainhardik120.macrokeyboard.data.local.MacroDatabase
+import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
 import com.jainhardik120.macrokeyboard.data.local.entity.ScreenEntity
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,7 +18,7 @@ class MacroRepositoryImpl @Inject constructor(
     private val TAG = "MacroRepositoryDebug"
     private val dao = db.dao
 
-    override suspend fun getScreen(id: Int): List<ScreenEntity> {
+    override fun getScreen(id: Int): Flow<List<ScreenEntity>> {
         return dao.getScreenInfo(id)
     }
 
@@ -31,7 +34,23 @@ class MacroRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getButtonDetails(screenId: Int, childId: Int): ScreenEntity? {
-        return dao.getButtonInfo(parentId = screenId, childId = childId)
+    override suspend fun getButtonDetails(childId: Int): ScreenEntity? {
+        return dao.getButtonInfo(childId = childId)
+    }
+
+    override suspend fun getButtonActions(id: Int): List<ActionEntity> {
+        return dao.getActions(id)
+    }
+
+    override suspend fun addAction(action: ActionEntity) {
+        dao.insertAction(action)
+    }
+
+    override suspend fun addButton(screen: ScreenEntity) : Long{
+        return dao.insertButton(screen)
+    }
+
+    override suspend fun getAction(childId: Int, sno: Int): ActionEntity? {
+        return dao.getActionInfo(childId, sno)
     }
 }

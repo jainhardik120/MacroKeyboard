@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.jainhardik120.macrokeyboard.ui.presentation.action.ActionEditScreen
 import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditButtonScreen
 import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreen
 import com.jainhardik120.macrokeyboard.ui.presentation.settings.SettingsScreen
@@ -31,33 +32,55 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = Screen.HomeScreen.route){
-                        composable(route = Screen.HomeScreen.route){
+                    NavHost(
+                        navController = navController,
+                        startDestination = Screen.HomeScreen.route
+                    ) {
+                        composable(route = Screen.HomeScreen.route) {
                             HomeScreen(onNavigate = {
                                 it.route?.let { it1 -> navController.navigate(it1) }
                             })
                         }
-                        composable(route = Screen.SettingsScreen.route){
+                        composable(route = Screen.SettingsScreen.route) {
                             SettingsScreen(onNavigate = {
                                 navController.navigateUp()
                             })
                         }
-                        composable(route = Screen.EditScreen.route + "/{screenId}/{childId}",
-                        arguments = listOf(
-                            navArgument("screenId"){
-                                type = NavType.StringType
-                                nullable = false
-                            },
-                            navArgument("childId"){
-                                type = NavType.StringType
-                                nullable = false
-                            }
-                        )
-                        ){
+                        composable(route = Screen.EditScreen.route + "/{screenId}?childId={childId}",
+                            arguments = listOf(
+                                navArgument("screenId") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                },
+                                navArgument("childId") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = "-1"
+                                }
+                            )
+                        ) {
                             EditButtonScreen(onNavigate = {
-                                navController.navigateUp()
+                                if(it.route==null){
+                                    navController.navigateUp()
+                                }else{
+                                    navController.navigate(it.route)
+                                }
                             })
                         }
+                        composable(route = Screen.EditActionScreen.route + "/{childId}/{sno}",
+                            arguments = listOf(
+                                navArgument("childId") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                },
+                                navArgument("sno") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                }
+                            )) {
+                                ActionEditScreen(onNavigate = {navController.navigateUp()})
+                        }
+
                     }
                 }
             }

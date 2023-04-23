@@ -19,14 +19,14 @@ import com.jainhardik120.macrokeyboard.util.UiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditButtonScreen(onNavigate: () -> Unit, viewModel: EditScreenViewModel = hiltViewModel()) {
+fun EditButtonScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: EditScreenViewModel = hiltViewModel()) {
     val state = viewModel.state
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {
             when (it) {
                 is UiEvent.Navigate -> {
-                    onNavigate()
+                    onNavigate(it)
                 }
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(it.message)
@@ -42,8 +42,8 @@ fun EditButtonScreen(onNavigate: () -> Unit, viewModel: EditScreenViewModel = hi
         ) {
             OutlinedTextField(
                 value = state.label,
-                onValueChange = {
-
+                onValueChange = { string ->
+                    viewModel.onEvent(EditButtonScreenEvent.ButtonNameChanged(string))
                 },
                 label = {
                     Text(text = "Button Name")
@@ -54,52 +54,34 @@ fun EditButtonScreen(onNavigate: () -> Unit, viewModel: EditScreenViewModel = hi
             )
             Spacer(modifier = Modifier.height(4.dp))
             Row() {
-                Button(
-                    onClick = { viewModel.onEvent(EditButtonScreenEvent.NewActionButtonClick) }
-                ) {
-                    Text(text = "Add New Action")
+                if(state.childId.isNotEmpty()){
+                    Button(
+                        onClick = { viewModel.onEvent(EditButtonScreenEvent.NewActionButtonClick) }
+                    ) {
+                        Text(text = "Add New Action")
+                    }
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 Button(
                     onClick = { viewModel.onEvent(EditButtonScreenEvent.SaveButtonClick) }
                 ) {
-                    Text(text = "Save")
+                    if(state.childId.isNotEmpty()){
+                        Text(text = "Save Button")
+                    } else {
+                        Text(text = "Create Button")
+                    }
                 }
             }
             LazyColumn {
-                items(state.actions.size) { index ->
-                    ElevatedCard(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = state.actions[index].type.toString(),
-                            onValueChange = {
-
-                            },
-                            label = {
-                                Text(text = "Button Name")
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = state.actions[index].data,
-                            onValueChange = {
-
-                            },
-                            label = {
-                                Text(text = "Button Name")
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        )
-                    }
-                }
+//                items(state.actions.size) { index ->
+//                    ElevatedCard(
+//                        Modifier
+//                            .fillMaxWidth()
+//                            .padding(16.dp)
+//                    ) {
+//
+//                    }
+//                }
             }
 
         }

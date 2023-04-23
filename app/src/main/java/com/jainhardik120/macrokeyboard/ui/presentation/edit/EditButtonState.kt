@@ -7,6 +7,5 @@ data class EditButtonState(
     val screenId: String = "",
     val childId: String = "",
     val label: String = "",
-    val type: Int = 0,
-    val actions : List<Action> = listOf()
+    val type: Int = 0
 )
