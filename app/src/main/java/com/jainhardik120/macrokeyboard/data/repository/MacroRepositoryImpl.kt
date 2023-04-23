@@ -1,6 +1,7 @@
 package com.jainhardik120.macrokeyboard.data.repository
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.jainhardik120.macrokeyboard.data.local.MacroDatabase
 import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
@@ -22,6 +23,11 @@ class MacroRepositoryImpl @Inject constructor(
         return dao.getScreenInfo(id)
     }
 
+    override  fun getActions(id: Int): Flow<List<ActionEntity>> {
+        Log.d(TAG, "getActions: Ran")
+        return dao.getActions(id)
+    }
+
     override fun getConnectionInfo(): Pair<String, Int> {
         return Pair(sharedPreferences.getString("ipAddress", "192.168.10.104")!!, sharedPreferences.getInt("port", 9155))
     }
@@ -39,7 +45,7 @@ class MacroRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getButtonActions(id: Int): List<ActionEntity> {
-        return dao.getActions(id)
+        return dao.getActionsInfo(id)
     }
 
     override suspend fun addAction(action: ActionEntity) {

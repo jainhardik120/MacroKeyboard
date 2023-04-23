@@ -57,14 +57,14 @@ class ActionEditViewModel @Inject constructor(
                 }
             }
             is ActionEditScreenEvent.ActionDataChanged -> {
+                state = state.copy(data = event.string)
+            }
+            is ActionEditScreenEvent.ActionTypeChanged -> {
                 state = if (event.string.isNotEmpty()){
                     state.copy(actionType = event.string.toInt())
                 }else{
                     state.copy(actionType = -1)
                 }
-            }
-            is ActionEditScreenEvent.ActionTypeChanged -> {
-                state = state.copy(data = event.string)
             }
         }
     }

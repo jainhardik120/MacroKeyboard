@@ -1,5 +1,6 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.home
 
+import android.media.midi.MidiDeviceInfo.PortInfo
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +33,9 @@ class HomeViewModel @Inject constructor(
     private val _uiEvent =  Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
+    var portInfo = Pair("", 0)
+
+
     val screenInfo = repository.getScreen(state.currentScreen)
 
     private fun sendUiEvent(event: UiEvent) {
@@ -42,7 +46,9 @@ class HomeViewModel @Inject constructor(
 
     init {
         Log.d(TAG, "HomeViewModel: Initialized")
+        portInfo = repository.getConnectionInfo()
     }
+
 
     fun navigateNewButton(){
         sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs("0","0")))
@@ -70,12 +76,25 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleButtonPress(screenEntity: ScreenEntity){
+        if(screenEntity.type==1){
+            viewModelScope.launch {
+                val list = screenEntity.childId?.let { repository.getButtonActions(it) }
+                if (list != null) {
+                    Log.d(TAG, "handleButtonPress: ${list.size}")
+                    for (i in list){
+                        sendData(i.data)
+                    }
+                }
+            }
+        } else {
+            // TODO: Change Screen Implementation
+        }
 
     }
 
-    suspend fun sendData(ipAddress:String, port: Int, message: String){
+    suspend fun sendData(message: String){
         withContext(Dispatchers.IO) {
-            val client = Socket(ipAddress, port)
+            val client = Socket(portInfo.first, portInfo.second)
             val printWriter = PrintWriter(client.getOutputStream(), true)
             printWriter.write(message)
             printWriter.flush()

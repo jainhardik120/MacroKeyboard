@@ -15,6 +15,9 @@ interface MacroDao {
     @Query("SELECT * FROM screen_table WHERE parentId = :id")
      fun getScreenInfo(id: Int): Flow<List<ScreenEntity>>
 
+    @Query("SELECT * FROM actions_table WHERE id = :id")
+    suspend fun getActionsInfo(id: Int): List<ActionEntity>
+
     @Query("SELECT * FROM screen_table WHERE childId = :childId")
     suspend fun getButtonInfo(
         childId: Int
@@ -27,7 +30,7 @@ interface MacroDao {
     ): ActionEntity?
 
     @Query("SELECT * FROM actions_table WHERE id = :id")
-    suspend fun getActions(id:Int):List<ActionEntity>
+     fun getActions(id:Int):Flow<List<ActionEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAction(actionEntity: ActionEntity)

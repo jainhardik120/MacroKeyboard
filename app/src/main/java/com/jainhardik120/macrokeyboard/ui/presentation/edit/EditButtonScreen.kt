@@ -1,26 +1,37 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.edit
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
 import com.jainhardik120.macrokeyboard.ui.presentation.settings.SettingsScreenEvent
 import com.jainhardik120.macrokeyboard.util.UiEvent
+import kotlinx.coroutines.flow.receiveAsFlow
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun EditButtonScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: EditScreenViewModel = hiltViewModel()) {
+fun EditButtonScreen(
+    onNavigate: (UiEvent.Navigate) -> Unit,
+    viewModel: EditScreenViewModel = hiltViewModel()
+) {
     val state = viewModel.state
+    val TAG = "EditButtonScreen"
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {
@@ -54,7 +65,7 @@ fun EditButtonScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: EditScre
             )
             Spacer(modifier = Modifier.height(4.dp))
             Row() {
-                if(state.childId.isNotEmpty()){
+                if (state.childId.isNotEmpty()) {
                     Button(
                         onClick = { viewModel.onEvent(EditButtonScreenEvent.NewActionButtonClick) }
                     ) {
@@ -65,7 +76,7 @@ fun EditButtonScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: EditScre
                 Button(
                     onClick = { viewModel.onEvent(EditButtonScreenEvent.SaveButtonClick) }
                 ) {
-                    if(state.childId.isNotEmpty()){
+                    if (state.childId.isNotEmpty()) {
                         Text(text = "Save Button")
                     } else {
                         Text(text = "Create Button")
@@ -73,15 +84,37 @@ fun EditButtonScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: EditScre
                 }
             }
             LazyColumn {
-//                items(state.actions.size) { index ->
-//                    ElevatedCard(
-//                        Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp)
-//                    ) {
-//
-//                    }
-//                }
+                items(state.list.size) {
+                    Card(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                    ) {
+                        Row() {
+                            Column() {
+                                Text(text = state.list[it].type.toString())
+                                Text(text = state.list[it].data.toString())
+                            }
+                            Surface(
+                                Modifier
+                                    .size(36.dp)
+                                    .combinedClickable(
+                                        onClick = {
+                                            viewModel.onEvent(
+                                                EditButtonScreenEvent.EditButtonClicked(
+                                                    it
+                                                )
+                                            )
+                                        }
+                                    )) {
+                                Icon(Icons.Filled.Edit, contentDescription = "Edit Button")
+                            }
+
+                        }
+
+
+                    }
+                }
             }
 
         }

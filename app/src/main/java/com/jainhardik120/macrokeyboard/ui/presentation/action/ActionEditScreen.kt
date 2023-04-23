@@ -1,5 +1,6 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.action
 
+import android.app.Notification.Action
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -66,6 +67,12 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                     .fillMaxWidth()
                     .padding(16.dp)
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = {
+                viewModel.onEvent(ActionEditScreenEvent.ButtonSaveClicked)
+            }) {
+                Text(text = "Save")
+            }
         }
     }
 }

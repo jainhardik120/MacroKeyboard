@@ -1,6 +1,7 @@
 package com.jainhardik120.macrokeyboard
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -60,9 +61,11 @@ class MainActivity : ComponentActivity() {
                             )
                         ) {
                             EditButtonScreen(onNavigate = {
+                                Log.d("TAG", "onCreate: ${it.route}")
                                 if(it.route==null){
                                     navController.navigateUp()
                                 }else{
+
                                     navController.navigate(it.route)
                                 }
                             })

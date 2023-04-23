@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
 import com.jainhardik120.macrokeyboard.data.local.entity.ScreenEntity
 import com.jainhardik120.macrokeyboard.domain.model.Action
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
@@ -15,6 +16,9 @@ import com.jainhardik120.macrokeyboard.util.Screen
 import com.jainhardik120.macrokeyboard.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,6 +51,9 @@ class EditScreenViewModel @Inject constructor(
                         type = button.type,
                         newButton = false
                     )
+                }
+                repository.getActions(childId.toInt()).collect{
+                    state = state.copy(list = it)
                 }
             }
         }
@@ -86,19 +93,20 @@ class EditScreenViewModel @Inject constructor(
                                     type = state.type
                                 )
                             )
-                            Log.d(TAG, "onEvent: $childId")
                             state = state.copy(childId = childId.toString())
                         }else{
                             sendUiEvent(UiEvent.ShowSnackbar("Name can't be Empty"))
                         }
-
                     }
                 }
                 is EditButtonScreenEvent.NewActionButtonClick -> {
-
+                    sendUiEvent(UiEvent.Navigate(Screen.EditActionScreen.withArgs(state.childId, (state.list.size+1).toString())))
                 }
                 is EditButtonScreenEvent.ButtonNameChanged -> {
                     state = state.copy(label = event.string)
+                }
+                is EditButtonScreenEvent.EditButtonClicked -> {
+                    sendUiEvent(UiEvent.Navigate(Screen.EditActionScreen.withArgs(state.childId, (state.list[event.id].sno).toString())))
                 }
             }
         }

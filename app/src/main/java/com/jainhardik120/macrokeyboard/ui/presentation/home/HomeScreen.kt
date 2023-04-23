@@ -45,7 +45,7 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
             Button(onClick = { viewModel.onEvent(HomeScreenEvent.OnSettingsButtonClicked) }) {
                 Text(text = "Settings")
             }
-            LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 48.dp)) {
+            LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 96.dp)) {
                 itemsIndexed(screenInfo.value) { index, item ->
                     androidx.compose.material.Surface(
                         modifier = Modifier.combinedClickable(
@@ -56,9 +56,9 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                             onLongClick = {
                                 viewModel.onEvent(HomeScreenEvent.OnButtonLongClicked(item))
                             }
-                        )
+                        ).size(96.dp)
                     ) {
-                        Column(Modifier.size(28.dp)) {
+                        Column(Modifier.size(96.dp)) {
                             Text(text = item.label)
                         }
                     }
@@ -72,7 +72,7 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                     enabled = true
                 )
             ) {
-                Column(Modifier.size(28.dp)) {
+                Column(Modifier.size(96.dp)) {
                     Text(text = "New")
                 }
             }

@@ -20,6 +20,8 @@ interface MacroRepository {
 
     suspend fun getButtonActions(id:Int):List<ActionEntity>
 
+     fun getActions(id:Int):Flow<List<ActionEntity>>
+
     suspend fun getAction(childId: Int, sno : Int):ActionEntity?
 
     suspend fun addAction(action:ActionEntity)

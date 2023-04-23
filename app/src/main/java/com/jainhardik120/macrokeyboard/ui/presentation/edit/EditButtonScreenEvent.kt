@@ -4,4 +4,5 @@ sealed class EditButtonScreenEvent {
     object SaveButtonClick:EditButtonScreenEvent()
     object NewActionButtonClick:EditButtonScreenEvent()
     data class ButtonNameChanged(val string: String):EditButtonScreenEvent()
+    data class EditButtonClicked(val id: Int):EditButtonScreenEvent()
 }
