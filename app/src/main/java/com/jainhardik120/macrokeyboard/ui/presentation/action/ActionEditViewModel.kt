@@ -13,9 +13,15 @@ import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditButtonScreenEven
 import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditButtonState
 import com.jainhardik120.macrokeyboard.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.PrintWriter
+import java.net.Socket
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,7 +72,25 @@ class ActionEditViewModel @Inject constructor(
                     state.copy(actionType = -1)
                 }
             }
-            else -> {}
+            ActionEditScreenEvent.BackPressed -> TODO()
+            ActionEditScreenEvent.GetMouseCoordinates -> {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO){
+                        val portInfo = repository.getConnectionInfo()
+                        try {
+                            val client = Socket(portInfo.first, portInfo.second)
+                            val printWriter = PrintWriter(client.getOutputStream(), true)
+                            printWriter.write("{\"type\":\"${-1}\"}")
+                            printWriter.flush()
+                            printWriter.close()
+                            client.close()
+                        } catch (e:Exception){
+                            e.message?.let { UiEvent.ShowSnackbar(it) }?.let { sendUiEvent(it) }
+                        }
+
+                    }
+                }
+            }
         }
     }
 }

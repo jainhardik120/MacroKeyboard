@@ -7,4 +7,5 @@ sealed class ActionEditScreenEvent {
     data class ActionTypeChanged(val string: String) : ActionEditScreenEvent()
     data class ActionDataChanged(val string: String) : ActionEditScreenEvent()
     object BackPressed: ActionEditScreenEvent()
+    object GetMouseCoordinates: ActionEditScreenEvent()
 }

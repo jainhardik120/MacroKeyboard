@@ -41,6 +41,12 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 .fillMaxSize()
                 .padding(it)
         ) {
+            Text(text = "Type 1 : String Input")
+            Text(text = "Type 2 : Key Combo")
+            Text(text = "Type 3 : Mouse Move")
+            Text(text = "Type 4 : Mouse Click")
+            Text(text = "Type 5 : Delay")
+            Spacer(Modifier.height(8.dp))
             OutlinedTextField(
                 value = if (state.actionType == -1) "" else state.actionType.toString(),
                 onValueChange = { string ->
@@ -77,6 +83,12 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 viewModel.onEvent(ActionEditScreenEvent.ButtonSaveClicked)
             }) {
                 Text(text = "Save")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = {
+                viewModel.onEvent(ActionEditScreenEvent.GetMouseCoordinates)
+            }) {
+                Text(text = "Get Mouse Coordinates")
             }
         }
     }

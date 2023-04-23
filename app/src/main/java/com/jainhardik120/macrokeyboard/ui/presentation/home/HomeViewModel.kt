@@ -118,7 +118,6 @@ class HomeViewModel @Inject constructor(
 //                Log.d(TAG, "sendData: ${e.message}")
                 e.message?.let { UiEvent.ShowSnackbar(it) }?.let { sendUiEvent(it) }
             }
-            
         }
     }
 }
