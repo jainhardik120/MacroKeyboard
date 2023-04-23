@@ -1,4 +1,4 @@
-# MacroKeyboard
+# Macro Keys
 Macro Keys is an android application designed to provide seamless wireless control of a PC over a local area network. To use the application, simply run the accompanying Java program on the target PC, and obtain the IP address and Port for establishing a connection. Once this is done, you can easily set up an unlimited number of buttons on the application to perform various tasks on the PC.
 
 One of the major benefits of Macro Keys is the ability to send keyboard text inputs, a handy feature for those who frequently require repeated text inputs on their PC. This not only saves valuable time but also provides the user with an external control device that is both convenient and efficient. The application is versatile and can be used for controlling presentations and video playback, among other things.
