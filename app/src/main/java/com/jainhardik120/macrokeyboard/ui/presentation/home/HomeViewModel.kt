@@ -13,6 +13,7 @@ import com.jainhardik120.macrokeyboard.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,8 +31,7 @@ class HomeViewModel @Inject constructor(
     private val _uiEvent =  Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-
-    val screenInfo = repository.getScreen(state.currentScreen)
+    var screenInfo = repository.getScreen(state.currentScreen.last())
 
     private fun sendUiEvent(event: UiEvent) {
         viewModelScope.launch {
@@ -59,13 +59,19 @@ class HomeViewModel @Inject constructor(
                 handleButtonPress(event.screenEntity)
             }
             is HomeScreenEvent.OnButtonLongClicked->{
-                sendUiEvent(UiEvent.Navigate("${Screen.EditScreen.route}/${state.currentScreen.toString()}?childId=${event.screenEntity.childId.toString()}"))
+                sendUiEvent(UiEvent.Navigate("${Screen.EditScreen.route}/${state.currentScreen.last().toString()}?childId=${event.screenEntity.childId.toString()}"))
             }
             is HomeScreenEvent.BackPressed->{
-
+                if(state.currentScreen.size>1){
+                    val list = List<Int>(state.currentScreen.size-1){
+                        state.currentScreen[it]
+                    }
+                    state = state.copy(currentScreen = list)
+                    screenInfo = repository.getScreen(state.currentScreen.last())
+                }
             }
             HomeScreenEvent.OnNewButtonClicked -> {
-                sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs(state.currentScreen.toString())))
+                sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs(state.currentScreen.last().toString())))
             }
         }
     }
@@ -86,9 +92,16 @@ class HomeViewModel @Inject constructor(
                 }
             }
         } else {
-            // TODO: Change Screen Implementation
+            val list = List<Int>(state.currentScreen.size+1){
+                if(it<state.currentScreen.size){
+                    state.currentScreen[it]
+                }else{
+                    screenEntity.childId!!
+                }
+            }
+            state = state.copy(currentScreen = list)
+            screenInfo = repository.getScreen(state.currentScreen.last())
         }
-
     }
 
     suspend fun sendData(message: String){
