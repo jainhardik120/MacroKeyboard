@@ -7,21 +7,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
-import com.jainhardik120.macrokeyboard.domain.model.Action
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
-import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditButtonScreenEvent
-import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditButtonState
 import com.jainhardik120.macrokeyboard.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.PrintWriter
-import java.net.Socket
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,7 +20,6 @@ class ActionEditViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val repository: MacroRepository
 ) : ViewModel()  {
-    private val TAG = "ActionEditViewModel"
     var state by mutableStateOf(ActionEditState())
 
     private val _uiEvent = Channel<UiEvent>()

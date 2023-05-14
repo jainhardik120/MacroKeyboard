@@ -1,8 +1,6 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.edit
 
 import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
-import com.jainhardik120.macrokeyboard.domain.model.Action
-
 data class EditButtonState(
     val newButton:Boolean = true,
     val screenId: String = "",

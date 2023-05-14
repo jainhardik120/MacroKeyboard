@@ -14,7 +14,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,10 +24,9 @@ import com.jainhardik120.macrokeyboard.util.UiEvent
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel = hiltViewModel()) {
-    val TAG = "HomeScreen"
     val state = viewModel.state
     val screenInfo = viewModel.screenInfo.collectAsState(initial = emptyList())
-    val snackbarHostState = remember { SnackbarHostState() }
+    val hostState = remember { SnackbarHostState() }
     val haptic = LocalHapticFeedback.current
     LaunchedEffect(key1 = true) {
         viewModel.initialize()
@@ -39,7 +37,7 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                 }
 
                 is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(it.message)
+                    hostState.showSnackbar(it.message)
                 }
             }
         }
@@ -72,7 +70,7 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                 }
             }
         )
-    }, snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
+    }, snackbarHost = { SnackbarHost(hostState = hostState) }) {
         Column(
             Modifier
                 .fillMaxSize()

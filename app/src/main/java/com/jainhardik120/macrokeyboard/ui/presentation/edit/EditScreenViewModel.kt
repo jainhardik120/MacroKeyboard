@@ -22,10 +22,6 @@ class EditScreenViewModel @Inject constructor(
     private val repository: MacroRepository
 ) : ViewModel() {
 
-    companion object{
-        private const val TAG = "EditScreenViewModel"
-    }
-
     var state by mutableStateOf(EditButtonState())
 
     private val _uiEvent = Channel<UiEvent>()

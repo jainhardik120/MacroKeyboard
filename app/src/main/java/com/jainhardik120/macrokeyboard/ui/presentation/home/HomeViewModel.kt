@@ -26,8 +26,12 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val repository: MacroRepository
 ) : ViewModel() {
+
+    companion object{
+        private const val TAG = "HomeViewModel"
+    }
     var state by mutableStateOf(HomeState())
-    private val TAG = "HomeViewModel"
+
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -77,12 +81,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
-    fun navigateNewButton() {
-        sendUiEvent(UiEvent.Navigate(Screen.EditScreen.withArgs("0", "0")))
-    }
-
-
     fun onEvent(event: HomeScreenEvent) {
         when (event) {
             is HomeScreenEvent.OnSettingsButtonClicked -> {
@@ -97,7 +95,7 @@ class HomeViewModel @Inject constructor(
                 sendUiEvent(
                     UiEvent.Navigate(
                         "${Screen.EditScreen.route}/${
-                            state.currentScreen.last().toString()
+                            state.currentScreen.last()
                         }?childId=${event.screenEntity.childId.toString()}"
                     )
                 )
@@ -105,7 +103,7 @@ class HomeViewModel @Inject constructor(
 
             is HomeScreenEvent.BackPressed -> {
                 if (state.currentScreen.size > 1) {
-                    val list = List<Int>(state.currentScreen.size - 1) {
+                    val list = List(state.currentScreen.size - 1) {
                         state.currentScreen[it]
                     }
                     state = state.copy(currentScreen = list)

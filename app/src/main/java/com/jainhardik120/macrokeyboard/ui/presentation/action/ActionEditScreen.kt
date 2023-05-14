@@ -18,9 +18,9 @@ import com.jainhardik120.macrokeyboard.util.UiEvent
 @Composable
 fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hiltViewModel()) {
     val state = viewModel.state
-    val snackbarHostState = remember { SnackbarHostState() }
+    val hostState = remember { SnackbarHostState() }
     var expanded by remember { mutableStateOf(false) }
-    val list = listOf<String>("String Input", "Key Combo", "Mouse Move", "Mouse Click", "Delay")
+    val list = listOf("String Input", "Key Combo", "Mouse Move", "Mouse Click", "Delay")
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {
             when (it) {
@@ -29,7 +29,7 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 }
 
                 is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(it.message)
+                    hostState.showSnackbar(it.message)
                 }
             }
         }
@@ -37,7 +37,7 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
     BackHandler(enabled = true) {
         viewModel.onEvent(ActionEditScreenEvent.BackPressed)
     }
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
+    Scaffold(snackbarHost = { SnackbarHost(hostState = hostState) }) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -96,12 +96,12 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 }
                 3 -> {
                     Row {
-                        OutlinedTextField(value = state.xCoordinate, onValueChange = {
-                            viewModel.onEvent(ActionEditScreenEvent.MouseXChanged(it))
+                        OutlinedTextField(value = state.xCoordinate, onValueChange = {string->
+                            viewModel.onEvent(ActionEditScreenEvent.MouseXChanged(string))
                         })
                         Spacer(modifier = Modifier.width(8.dp))
-                        OutlinedTextField(value = state.yCoordinate, onValueChange = {
-                            viewModel.onEvent(ActionEditScreenEvent.MouseYChanged(it))
+                        OutlinedTextField(value = state.yCoordinate, onValueChange = {string->
+                            viewModel.onEvent(ActionEditScreenEvent.MouseYChanged(string))
                         })
                     }
                 }

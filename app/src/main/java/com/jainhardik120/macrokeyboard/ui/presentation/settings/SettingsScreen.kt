@@ -11,16 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreenEvent
 import com.jainhardik120.macrokeyboard.util.UiEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     onNavigate: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val hostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {
             when (it) {
@@ -28,7 +26,7 @@ fun SettingsScreen(
                     onNavigate()
                 }
                 is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(it.message)
+                    hostState.showSnackbar(it.message)
                 }
             }
         }
@@ -36,14 +34,14 @@ fun SettingsScreen(
     BackHandler(enabled = true) {
         viewModel.onEvent(SettingsScreenEvent.BackPressed)
     }
-    Scaffold(snackbarHost = {SnackbarHost(hostState = snackbarHostState)}) {
+    Scaffold(snackbarHost = {SnackbarHost(hostState = hostState)}) {
         Column(Modifier.fillMaxSize().padding(it),
             verticalArrangement = Arrangement.Center
         ) {
             OutlinedTextField(
                 value = viewModel.state.ipAddress,
-                onValueChange = {
-                    viewModel.onEvent(SettingsScreenEvent.ipAddressChanged(it))
+                onValueChange = {string->
+                    viewModel.onEvent(SettingsScreenEvent.ipAddressChanged(string))
                 },
                 label = {
                     Text(text = "IP Address")
@@ -54,8 +52,8 @@ fun SettingsScreen(
             )
             OutlinedTextField(
                 value = viewModel.state.port,
-                onValueChange = {
-                    viewModel.onEvent(SettingsScreenEvent.portChanged(it))
+                onValueChange = {string->
+                    viewModel.onEvent(SettingsScreenEvent.portChanged(string))
                 },
                 label = {
                     Text(text = "Port")

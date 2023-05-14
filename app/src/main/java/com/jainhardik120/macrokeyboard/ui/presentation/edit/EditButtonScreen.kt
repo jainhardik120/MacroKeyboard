@@ -18,8 +18,7 @@ fun EditButtonScreen(
     viewModel: EditScreenViewModel = hiltViewModel()
 ) {
     val state = viewModel.state
-    val TAG = "EditButtonScreen"
-    val snackbarHostState = remember { SnackbarHostState() }
+    val hostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {
             when (it) {
@@ -27,7 +26,7 @@ fun EditButtonScreen(
                     onNavigate(it)
                 }
                 is UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(it.message)
+                    hostState.showSnackbar(it.message)
                 }
             }
         }
@@ -35,7 +34,7 @@ fun EditButtonScreen(
     BackHandler(enabled = true) {
         viewModel.onEvent(EditButtonScreenEvent.BackPressed)
     }
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
+    Scaffold(snackbarHost = { SnackbarHost(hostState = hostState) }) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -87,10 +86,10 @@ fun EditButtonScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 4.dp)
                     ) {
-                        Row() {
+                        Row{
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(text = state.list[it].type.toString())
-                                Text(text = state.list[it].data.toString())
+                                Text(text = state.list[it].data)
                             }
                             IconButton(onClick = {
                                 viewModel.onEvent(

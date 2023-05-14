@@ -1,7 +1,5 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.edit
 
-import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreenEvent
-
 sealed class EditButtonScreenEvent {
     object SaveButtonClick:EditButtonScreenEvent()
     object NewActionButtonClick:EditButtonScreenEvent()

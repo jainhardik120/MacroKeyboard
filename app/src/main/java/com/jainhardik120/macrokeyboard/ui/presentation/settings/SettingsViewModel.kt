@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
-import com.jainhardik120.macrokeyboard.util.Screen
 import com.jainhardik120.macrokeyboard.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -18,7 +17,6 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val repository: MacroRepository
 ) : ViewModel() {
-    private val TAG = "SettingsViewModel"
     var state by mutableStateOf(SettingsState())
 
     private val _uiEvent =  Channel<UiEvent>()
