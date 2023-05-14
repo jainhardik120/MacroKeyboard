@@ -1,32 +1,17 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.edit
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
-import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreenEvent
-import com.jainhardik120.macrokeyboard.ui.presentation.settings.SettingsScreenEvent
 import com.jainhardik120.macrokeyboard.util.UiEvent
-import kotlinx.coroutines.flow.receiveAsFlow
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EditButtonScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,

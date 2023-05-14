@@ -1,24 +1,17 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.edit
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
 import com.jainhardik120.macrokeyboard.data.local.entity.ScreenEntity
-import com.jainhardik120.macrokeyboard.domain.model.Action
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
-import com.jainhardik120.macrokeyboard.ui.presentation.settings.SettingsState
 import com.jainhardik120.macrokeyboard.util.Screen
 import com.jainhardik120.macrokeyboard.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +22,10 @@ class EditScreenViewModel @Inject constructor(
     private val repository: MacroRepository
 ) : ViewModel() {
 
-    private val TAG = "EditScreenViewModel"
+    companion object{
+        private const val TAG = "EditScreenViewModel"
+    }
+
     var state by mutableStateOf(EditButtonState())
 
     private val _uiEvent = Channel<UiEvent>()
@@ -133,7 +129,9 @@ class EditScreenViewModel @Inject constructor(
                         )
                     )
                 }
-                EditButtonScreenEvent.BackPressed -> TODO()
+                EditButtonScreenEvent.BackPressed -> {
+
+                }
                 EditButtonScreenEvent.DeleteClicked -> {
                     if (state.newButton){
                         if(state.list.isNotEmpty()){

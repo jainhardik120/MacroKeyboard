@@ -46,10 +46,28 @@ class ActionEditViewModel @Inject constructor(
             val sno = savedStateHandle.get<String>("sno")!!
             val childId = savedStateHandle.get<String>("childId")!!
             val initData = repository.getAction(childId.toInt(), sno.toInt())
-            if(initData==null){
-                state = state.copy(id = childId.toInt(), sno = sno.toInt())
+            state = if(initData==null){
+                state.copy(id = childId.toInt(), sno = sno.toInt(), actionType = 1, stringData = "")
             }else{
-                state = state.copy(id = childId.toInt(), sno = sno.toInt(),actionType = initData.type, data = initData.data)
+                when(initData.type){
+                    1->{
+                        state = state.copy(stringData = initData.data)
+                    }
+                    2 -> {
+
+                    }
+                    3 -> {
+                        val arr = initData.data.split(",")
+                        state = state.copy(xCoordinate = arr[0], yCoordinate = arr[1])
+                    }
+                    4 -> {
+                        state = state.copy(mouseButton = initData.data)
+                    }
+                    5 -> {
+                        state = state.copy(delayMilliSeconds = initData.data)
+                    }
+                }
+                state.copy(id = childId.toInt(), sno = sno.toInt(),actionType = initData.type)
             }
         }
     }
@@ -58,12 +76,30 @@ class ActionEditViewModel @Inject constructor(
         when (event) {
             is ActionEditScreenEvent.ButtonSaveClicked -> {
                 viewModelScope.launch {
-                    repository.addAction(ActionEntity(state.id, state.sno, state.actionType, state.data))
+                    var data = ""
+                    when(state.actionType){
+                        1->{
+                            data = state.stringData
+                        }
+                        2 -> {
+
+                        }
+                        3 -> {
+                            data = "${state.xCoordinate},${state.yCoordinate}"
+                        }
+                        4 -> {
+                            data = state.mouseButton
+                        }
+                        5 -> {
+                            data= state.delayMilliSeconds
+                        }
+                    }
+                    repository.addAction(ActionEntity(state.id, state.sno, state.actionType, data))
                     sendUiEvent(UiEvent.Navigate())
                 }
             }
-            is ActionEditScreenEvent.ActionDataChanged -> {
-                state = state.copy(data = event.string)
+            is ActionEditScreenEvent.StringActionDataChanged -> {
+                state = state.copy(stringData = event.string)
             }
             is ActionEditScreenEvent.ActionTypeChanged -> {
                 state = if (event.string.isNotEmpty()){
@@ -72,24 +108,21 @@ class ActionEditViewModel @Inject constructor(
                     state.copy(actionType = -1)
                 }
             }
-            ActionEditScreenEvent.BackPressed -> TODO()
-            ActionEditScreenEvent.GetMouseCoordinates -> {
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO){
-                        val portInfo = repository.getConnectionInfo()
-                        try {
-                            val client = Socket(portInfo.first, portInfo.second)
-                            val printWriter = PrintWriter(client.getOutputStream(), true)
-                            printWriter.write("{\"type\":\"${-1}\"}")
-                            printWriter.flush()
-                            printWriter.close()
-                            client.close()
-                        } catch (e:Exception){
-                            e.message?.let { UiEvent.ShowSnackbar(it) }?.let { sendUiEvent(it) }
-                        }
+            is ActionEditScreenEvent.BackPressed -> {
 
-                    }
-                }
+            }
+
+            is ActionEditScreenEvent.MouseXChanged -> {
+                state = state.copy(xCoordinate = event.x)
+            }
+            is ActionEditScreenEvent.MouseYChanged -> {
+                state = state.copy(yCoordinate = event.y)
+            }
+            is ActionEditScreenEvent.DelayChanged -> {
+                state = state.copy(delayMilliSeconds = event.delay)
+            }
+            is ActionEditScreenEvent.MouseKeyChanged -> {
+                state = state.copy(mouseButton = event.key)
             }
         }
     }

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,11 +31,13 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
     val snackbarHostState = remember { SnackbarHostState() }
     val haptic = LocalHapticFeedback.current
     LaunchedEffect(key1 = true) {
+        viewModel.initialize()
         viewModel.uiEvent.collect {
             when (it) {
                 is UiEvent.Navigate -> {
                     onNavigate(it)
                 }
+
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(it.message)
                 }
@@ -47,11 +51,23 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
         CenterAlignedTopAppBar(
             title = {
                 Text("Macro Keys", maxLines = 1, overflow = TextOverflow.Ellipsis)
-            },actions = {
+            }, actions = {
                 IconButton(onClick = { viewModel.onEvent(HomeScreenEvent.OnSettingsButtonClicked) }) {
                     Icon(
                         imageVector = Icons.Filled.Settings,
                         contentDescription = "Settings"
+                    )
+                }
+                IconButton(onClick = {
+                    viewModel.onEvent(HomeScreenEvent.CloseClicked)
+                }) {
+                    Icon(
+                        if (!state.connectedState) {
+                            Icons.Filled.Refresh
+                        } else {
+                            Icons.Filled.Close
+                        },
+                        contentDescription = "Close Icon"
                     )
                 }
             }
@@ -63,37 +79,59 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                 .padding(it)
         ) {
             LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 96.dp)) {
-                items(screenInfo.value.size+1) { index ->
-                    if(index==screenInfo.value.size){
+                items(screenInfo.value.size + 1) { index ->
+                    if (index == screenInfo.value.size) {
                         androidx.compose.material.Surface(
-                            modifier = Modifier.combinedClickable(
-                                onClick = {
-                                    viewModel.onEvent(HomeScreenEvent.OnNewButtonClicked)
-                                },
-                                enabled = true
-                            ).padding(8.dp),
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = {
+                                        viewModel.onEvent(HomeScreenEvent.OnNewButtonClicked)
+                                    },
+                                    enabled = true
+                                )
+                                .padding(8.dp),
                             color = MaterialTheme.colorScheme.secondaryContainer
                         ) {
-                            Column(modifier = Modifier.size(96.dp), verticalArrangement = Arrangement.SpaceAround) {
-                                Text(text = "New", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                            Column(
+                                modifier = Modifier.size(96.dp),
+                                verticalArrangement = Arrangement.SpaceAround
+                            ) {
+                                Text(
+                                    text = "New",
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         }
-                    }else{
+                    } else {
                         androidx.compose.material.Surface(
-                            modifier = Modifier.combinedClickable(
-                                onClick = {
-                                    viewModel.onEvent(HomeScreenEvent.OnButtonClicked(screenInfo.value[index]))
-                                },
-                                enabled = true,
-                                onLongClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    viewModel.onEvent(HomeScreenEvent.OnButtonLongClicked(screenInfo.value[index]))
-                                }
-                            ).padding(8.dp),
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = {
+                                        viewModel.onEvent(HomeScreenEvent.OnButtonClicked(screenInfo.value[index]))
+                                    },
+                                    enabled = true,
+                                    onLongClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        viewModel.onEvent(
+                                            HomeScreenEvent.OnButtonLongClicked(
+                                                screenInfo.value[index]
+                                            )
+                                        )
+                                    }
+                                )
+                                .padding(8.dp),
                             color = MaterialTheme.colorScheme.secondaryContainer
                         ) {
-                            Column(modifier = Modifier.size(96.dp), verticalArrangement = Arrangement.SpaceAround) {
-                                Text(text = screenInfo.value[index].label, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                            Column(
+                                modifier = Modifier.size(96.dp),
+                                verticalArrangement = Arrangement.SpaceAround
+                            ) {
+                                Text(
+                                    text = screenInfo.value[index].label,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         }
                     }

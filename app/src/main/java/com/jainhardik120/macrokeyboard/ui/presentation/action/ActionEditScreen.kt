@@ -1,18 +1,17 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.action
 
-import android.app.Notification.Action
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditButtonScreenEvent
-import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditScreenViewModel
-import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreenEvent
 import com.jainhardik120.macrokeyboard.util.UiEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,12 +19,15 @@ import com.jainhardik120.macrokeyboard.util.UiEvent
 fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hiltViewModel()) {
     val state = viewModel.state
     val snackbarHostState = remember { SnackbarHostState() }
+    var expanded by remember { mutableStateOf(false) }
+    val list = listOf<String>("String Input", "Key Combo", "Mouse Move", "Mouse Click", "Delay")
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {
             when (it) {
                 is UiEvent.Navigate -> {
                     onNavigate()
                 }
+
                 is UiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(it.message)
                 }
@@ -39,56 +41,99 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(it)
+                .padding(it),
         ) {
-            Text(text = "Type 1 : String Input")
-            Text(text = "Type 2 : Key Combo")
-            Text(text = "Type 3 : Mouse Move")
-            Text(text = "Type 4 : Mouse Click")
-            Text(text = "Type 5 : Delay")
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(
-                value = if (state.actionType == -1) "" else state.actionType.toString(),
-                onValueChange = { string ->
-                    viewModel.onEvent(
-                        ActionEditScreenEvent.ActionTypeChanged(
-                            string
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }) {
+                OutlinedTextField(
+                    value = list[state.actionType - 1],
+                    onValueChange = {
+
+                    },
+                    modifier = Modifier.menuAnchor(),
+                    label = { Text(text = "Action Type") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    readOnly = true
+                )
+                ExposedDropdownMenu(expanded = expanded, onDismissRequest = {
+                    expanded = false
+                }) {
+                    list.forEachIndexed { index, s ->
+                        DropdownMenuItem(
+                            text = { Text(text = s) },
+                            onClick = {
+                                viewModel.onEvent(ActionEditScreenEvent.ActionTypeChanged((index + 1).toString()))
+                                expanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                         )
-                    )
-                },
-                label = {
-                    Text(text = "Action Type")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
+                    }
+                }
+            }
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = state.data,
-                onValueChange = { string ->
-                    viewModel.onEvent(
-                        ActionEditScreenEvent.ActionDataChanged(string)
+            when (state.actionType) {
+                1 -> {
+                    OutlinedTextField(
+                        value = state.stringData,
+                        onValueChange = { string ->
+                            viewModel.onEvent(
+                                ActionEditScreenEvent.StringActionDataChanged(string)
+                            )
+                        },
+                        label = {
+                            Text(text = "Data")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     )
-                },
-                label = {
-                    Text(text = "Data")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
+                }
+                2 -> {
+
+                }
+                3 -> {
+                    Row {
+                        OutlinedTextField(value = state.xCoordinate, onValueChange = {
+                            viewModel.onEvent(ActionEditScreenEvent.MouseXChanged(it))
+                        })
+                        Spacer(modifier = Modifier.width(8.dp))
+                        OutlinedTextField(value = state.yCoordinate, onValueChange = {
+                            viewModel.onEvent(ActionEditScreenEvent.MouseYChanged(it))
+                        })
+                    }
+                }
+                4 -> {
+
+                }
+                5 -> {
+                    OutlinedTextField(
+                        value = state.delayMilliSeconds,
+                        onValueChange = { string ->
+                            viewModel.onEvent(
+                                ActionEditScreenEvent.DelayChanged(string)
+                            )
+                        },
+                        label = {
+                            Text(text = "Delay (in milliSeconds)")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    )
+                }
+
+                else -> {
+
+                }
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = {
                 viewModel.onEvent(ActionEditScreenEvent.ButtonSaveClicked)
             }) {
                 Text(text = "Save")
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = {
-                viewModel.onEvent(ActionEditScreenEvent.GetMouseCoordinates)
-            }) {
-                Text(text = "Get Mouse Coordinates")
             }
         }
     }

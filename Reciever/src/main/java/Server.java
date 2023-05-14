@@ -3,9 +3,7 @@ import java.awt.event.InputEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.*;
-import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.AWTException;
 import java.util.HashMap;
@@ -32,18 +30,12 @@ public class Server {
     public static void printTitle() {
         System.out.println("                  .----.");
         System.out.println("      .---------. | == |");
-        System.out.println(
-                "      |.-\"\"\"\"\"-.| |----|                                           __                   ___.                              .___");
-        System.out.println(
-                "      ||       || | == |   _____  _____     ____ _______   ____   |  | __  ____  ___.__.\\_ |__    ____ _____  _______   __| _/");
-        System.out.println(
-                "      ||       || |----|  /     \\ \\__  \\  _/ ___\\\\_  __ \\ /  _ \\  |  |/ /_/ __ \\<   |  | | __ \\  /  _ \\\\__  \\ \\_  __ \\ / __ | ");
-        System.out.println(
-                "      |'-.....-'| |::::| |  Y Y  \\ / __ \\_\\  \\___ |  | \\/(  <_> ) |    < \\  ___/ \\___  | | \\_\\ \\(  <_> )/ __ \\_|  | \\// /_/ | ");
-        System.out.println(
-                "      `\"\")---(\"\"` |___.| |__|_|  /(____  / \\___  >|__|    \\____/  |__|_ \\ \\___  >/ ____| |___  / \\____/(____  /|__|   \\____ | ");
-        System.out.println(
-                "    /:::::::::::\\ \"_   \"       \\/      \\/      \\/                      \\/     \\/ \\/          \\/             \\/             \\/ ");
+        System.out.println("      |.-\"\"\"\"\"-.| |----|                                           __                   ___.                              .___");
+        System.out.println("      ||       || | == |   _____  _____     ____ _______   ____   |  | __  ____  ___.__.\\_ |__    ____ _____  _______   __| _/");
+        System.out.println("      ||       || |----|  /     \\ \\__  \\  _/ ___\\\\_  __ \\ /  _ \\  |  |/ /_/ __ \\<   |  | | __ \\  /  _ \\\\__  \\ \\_  __ \\ / __ | ");
+        System.out.println("      |'-.....-'| |::::| |  Y Y  \\ / __ \\_\\  \\___ |  | \\/(  <_> ) |    < \\  ___/ \\___  | | \\_\\ \\(  <_> )/ __ \\_|  | \\// /_/ | ");
+        System.out.println("      `\"\")---(\"\"` |___.| |__|_|  /(____  / \\___  >|__|    \\____/  |__|_ \\ \\___  >/ ____| |___  / \\____/(____  /|__|   \\____ | ");
+        System.out.println("    /:::::::::::\\ \"_   \"       \\/      \\/      \\/                      \\/     \\/ \\/          \\/             \\/             \\/ ");
         System.out.println("   /:::=======:::\\`\\`\\");
         System.out.println("   `\"\"\"\"\"\"\"\"\"\"\"\"\"`  '-'");
     }

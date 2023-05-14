@@ -4,6 +4,7 @@ import com.jainhardik120.macrokeyboard.data.local.entity.ScreenEntity
 
 sealed class HomeScreenEvent{
     object OnSettingsButtonClicked:HomeScreenEvent()
+    object CloseClicked:HomeScreenEvent()
     data class OnButtonLongClicked(val screenEntity: ScreenEntity):HomeScreenEvent()
     data class OnButtonClicked(val screenEntity: ScreenEntity):HomeScreenEvent()
     object BackPressed:HomeScreenEvent()
