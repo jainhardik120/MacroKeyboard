@@ -77,7 +77,7 @@ class ActionEditViewModel @Inject constructor(
             val childId = savedStateHandle.get<String>("childId")!!
             val initData = repository.getAction(childId.toInt(), sno.toInt())
             state = if (initData == null) {
-                state.copy(id = childId.toInt(), sno = sno.toInt(), actionType = 1, stringData = "")
+                state.copy(id = childId.toInt(), sno = sno.toInt(), actionType = 1, stringData = "", isNewAction = true)
             } else {
                 val jsonObject = JSONObject(initData.data)
                 when (initData.type) {
@@ -174,7 +174,9 @@ class ActionEditViewModel @Inject constructor(
             }
 
             is ActionEditScreenEvent.BackPressed -> {
-
+                if(state.isNewAction){
+                    sendUiEvent(UiEvent.Navigate())
+                }
             }
 
             is ActionEditScreenEvent.MouseXChanged -> {

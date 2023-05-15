@@ -1,6 +1,5 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.home
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -27,11 +26,7 @@ class HomeViewModel @Inject constructor(
     private val repository: MacroRepository
 ) : ViewModel() {
 
-    companion object{
-        private const val TAG = "HomeViewModel"
-    }
     var state by mutableStateOf(HomeState())
-
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -46,11 +41,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    init {
-        Log.d(TAG, "HomeViewModel: Initialized")
-    }
-
     private fun openConnection() {
+        if(state.connectedState){
+           return
+        }
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try{
@@ -62,12 +56,14 @@ class HomeViewModel @Inject constructor(
                     state = state.copy(connectedState = false)
                     sendUiEvent(UiEvent.ShowSnackbar(e.message?:"Unknown Error"))
                 }
-
             }
         }
     }
 
     private fun closeConnection() {
+        if(!state.connectedState){
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             try{
                 printWriter.close()
@@ -136,9 +132,7 @@ class HomeViewModel @Inject constructor(
             viewModelScope.launch {
                 val list = screenEntity.childId?.let { repository.getButtonActions(it) }
                 if (list != null) {
-                    if (!state.connectedState) {
-                        openConnection()
-                    }
+                    openConnection()
                     val array = JSONArray()
                     for (i in list) {
                         val jsonObject = JSONObject()
@@ -167,10 +161,6 @@ class HomeViewModel @Inject constructor(
             state = state.copy(currentScreen = list)
             screenInfo = repository.getScreen(state.currentScreen.last())
         }
-    }
-
-    fun initialize() {
-        openConnection()
     }
 
 }

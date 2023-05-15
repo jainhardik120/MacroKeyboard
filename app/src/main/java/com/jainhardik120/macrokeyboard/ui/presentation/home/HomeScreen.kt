@@ -29,13 +29,12 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
     val hostState = remember { SnackbarHostState() }
     val haptic = LocalHapticFeedback.current
     LaunchedEffect(key1 = true) {
-        viewModel.initialize()
+
         viewModel.uiEvent.collect {
             when (it) {
                 is UiEvent.Navigate -> {
                     onNavigate(it)
                 }
-
                 is UiEvent.ShowSnackbar -> {
                     hostState.showSnackbar(it.message)
                 }
@@ -76,18 +75,19 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                 .fillMaxSize()
                 .padding(it)
         ) {
-            LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 96.dp)) {
+            LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 96.dp), modifier= Modifier.padding(8.dp)) {
                 items(screenInfo.value.size + 1) { index ->
                     if (index == screenInfo.value.size) {
-                        androidx.compose.material.Surface(
+                        Surface(
                             modifier = Modifier
+                                .padding(8.dp)
                                 .combinedClickable(
                                     onClick = {
                                         viewModel.onEvent(HomeScreenEvent.OnNewButtonClicked)
                                     },
                                     enabled = true
-                                )
-                                .padding(8.dp),
+                                ),
+                            shape = MaterialTheme.shapes.medium,
                             color = MaterialTheme.colorScheme.secondaryContainer
                         ) {
                             Column(
@@ -102,8 +102,9 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                             }
                         }
                     } else {
-                        androidx.compose.material.Surface(
+                        Surface(
                             modifier = Modifier
+                                .padding(8.dp)
                                 .combinedClickable(
                                     onClick = {
                                         viewModel.onEvent(HomeScreenEvent.OnButtonClicked(screenInfo.value[index]))
@@ -118,7 +119,8 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                                         )
                                     }
                                 )
-                                .padding(8.dp),
+                                ,
+                            shape = MaterialTheme.shapes.medium,
                             color = MaterialTheme.colorScheme.secondaryContainer
                         ) {
                             Column(
@@ -134,9 +136,7 @@ fun HomeScreen(onNavigate: (UiEvent.Navigate) -> Unit, viewModel: HomeViewModel 
                         }
                     }
                 }
-
             }
-
         }
     }
 }

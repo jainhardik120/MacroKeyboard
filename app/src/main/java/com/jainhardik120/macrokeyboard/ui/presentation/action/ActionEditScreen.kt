@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jainhardik120.macrokeyboard.util.UiEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hiltViewModel()) {
     val state = viewModel.state
@@ -103,13 +105,17 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 2 -> {
                     val searchText by viewModel.searchText.collectAsState()
                     val searchResults by viewModel.searchResult.collectAsState()
-                    LazyColumn(content = {
-                        itemsIndexed(state.keyComboArray){ _, item ->
-                            Row(Modifier.padding(8.dp)) {
-                                Text(text = item.second)
-                            }
+                    FlowRow(Modifier.fillMaxWidth()) {
+                        for (i in state.keyComboArray){
+                            InputChip(selected = false, onClick = {
+
+                            }, label = {
+                                Text(text = i.second)
+                            }, trailingIcon = {
+                                Icon(Icons.Filled.Close, contentDescription = "Close Icon")
+                            })
                         }
-                    })
+                    }
                     Column {
                         TextField(value = searchText, onValueChange = viewModel::onSearchTextChanged)
                         LazyColumn(content = {

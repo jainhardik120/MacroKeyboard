@@ -27,10 +27,13 @@ class EditScreenViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
+    private lateinit var screenId:String
+    private lateinit var childId:String
+
     init {
         viewModelScope.launch {
-            val screenId = savedStateHandle.get<String>("screenId")!!
-            val childId = savedStateHandle.get<String>("childId")!!
+            screenId = savedStateHandle.get<String>("screenId")?:"-1"
+            childId = savedStateHandle.get<String>("childId")?:"-1"
             if (childId == "-1") {
                 state = state.copy(screenId = screenId, newButton = true)
             } else {
@@ -126,7 +129,9 @@ class EditScreenViewModel @Inject constructor(
                     )
                 }
                 EditButtonScreenEvent.BackPressed -> {
-
+                    if(state.newButton){
+                        sendUiEvent(UiEvent.Navigate())
+                    }
                 }
                 EditButtonScreenEvent.DeleteClicked -> {
                     if (state.newButton){

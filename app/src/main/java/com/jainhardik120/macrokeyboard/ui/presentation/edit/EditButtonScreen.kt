@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jainhardik120.macrokeyboard.util.UiEvent
+import org.json.JSONObject
 
 @Composable
 fun EditButtonScreen(
@@ -58,55 +59,61 @@ fun EditButtonScreen(
                     Button(
                         onClick = { viewModel.onEvent(EditButtonScreenEvent.NewActionButtonClick) }
                     ) {
-                        Text(text = "Add New Action")
+                        Text(text = "New Action")
                     }
                 }
                 Button(
                     onClick = { viewModel.onEvent(EditButtonScreenEvent.SaveButtonClick) }
                 ) {
                     if (state.childId.isNotEmpty()) {
-                        Text(text = "Save Button")
+                        Text(text = "Save")
                     } else {
-                        Text(text = "Create Button")
+                        Text(text = "Create")
                     }
                 }
                 Button(onClick = {viewModel.onEvent(EditButtonScreenEvent.DeleteClicked)}){
                     if(state.newButton){
                         Text(text = "Cancel")
                     }else{
-                        Text(text = "Delete Button")
+                        Text(text = "Delete")
                     }
                 }
             }
             Spacer(modifier = Modifier.height(4.dp))
-            LazyColumn {
-                items(state.list.size) {
-                    Card(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
-                    ) {
-                        Row{
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(text = state.list[it].type.toString())
-                                Text(text = state.list[it].data)
-                            }
-                            IconButton(onClick = {
-                                viewModel.onEvent(
-                                    EditButtonScreenEvent.EditButtonClicked(
-                                        it
-                                    )
-                                )
-                            }) {
-                                Icon(Icons.Filled.Edit, contentDescription = "Edit Button")
+            LazyColumn(Modifier.padding(8.dp)) {
+                items(state.list.size) {index->
+                    Row{
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(text = state.list[index].type.toString())
+                            if(state.list[index].type==2){
+                                val array = JSONObject(state.list[index].data).getJSONArray("keys")
+                                var string = ""
+                                for (i in 0 until array.length()){
+                                    string = string.plus(array.getJSONObject(i).getString("keyName"))
+                                    if(i != array.length()-1){
+                                        string = string.plus(" + ")
+                                    }
+                                }
+                                Text(text = string)
+                            }else{
+                                Text(text = state.list[index].data)
                             }
                         }
-
-
+                        IconButton(onClick = {
+                            viewModel.onEvent(
+                                EditButtonScreenEvent.EditButtonClicked(
+                                    index
+                                )
+                            )
+                        }) {
+                            Icon(Icons.Filled.Edit, contentDescription = "Edit Button")
+                        }
+                    }
+                    if(index !=state.list.size-1){
+                        Divider()
                     }
                 }
             }
-
         }
     }
 }
