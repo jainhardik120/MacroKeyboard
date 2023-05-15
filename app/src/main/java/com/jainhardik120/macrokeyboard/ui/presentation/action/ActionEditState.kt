@@ -8,5 +8,6 @@ data class ActionEditState(
     val xCoordinate: String = "",
     val yCoordinate: String = "",
     val mouseButton: String = "",
-    val delayMilliSeconds: String = ""
+    val delayMilliSeconds: String = "",
+    val keyComboArray:List<Pair<Int, String>> = emptyList()
 )

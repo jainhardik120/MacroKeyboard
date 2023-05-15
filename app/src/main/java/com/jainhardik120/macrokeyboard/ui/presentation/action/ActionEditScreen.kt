@@ -1,10 +1,14 @@
 package com.jainhardik120.macrokeyboard.ui.presentation.action
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,6 +78,11 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = {
+                viewModel.onEvent(ActionEditScreenEvent.ButtonSaveClicked)
+            }) {
+                Text(text = "Save")
+            }
             when (state.actionType) {
                 1 -> {
                     OutlinedTextField(
@@ -92,7 +101,28 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                     )
                 }
                 2 -> {
-
+                    val searchText by viewModel.searchText.collectAsState()
+                    val searchResults by viewModel.searchResult.collectAsState()
+                    LazyColumn(content = {
+                        itemsIndexed(state.keyComboArray){ _, item ->
+                            Row(Modifier.padding(8.dp)) {
+                                Text(text = item.second)
+                            }
+                        }
+                    })
+                    Column {
+                        TextField(value = searchText, onValueChange = viewModel::onSearchTextChanged)
+                        LazyColumn(content = {
+                            itemsIndexed(searchResults){index, item ->  
+                                Text(text = item, modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp)
+                                    .clickable(
+                                        onClick = { viewModel.onKeyItemSelected(item) }
+                                    ))
+                            }
+                        })
+                    }
                 }
                 3 -> {
                     Row {
@@ -130,11 +160,7 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = {
-                viewModel.onEvent(ActionEditScreenEvent.ButtonSaveClicked)
-            }) {
-                Text(text = "Save")
-            }
+
         }
     }
 }

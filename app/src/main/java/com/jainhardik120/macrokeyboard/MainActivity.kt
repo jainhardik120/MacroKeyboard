@@ -65,7 +65,6 @@ class MainActivity : ComponentActivity() {
                                 if(it.route==null){
                                     navController.navigateUp()
                                 }else{
-
                                     navController.navigate(it.route)
                                 }
                             })
