@@ -25,6 +25,7 @@ fun SettingsScreen(
                 is UiEvent.Navigate -> {
                     onNavigate()
                 }
+
                 is UiEvent.ShowSnackbar -> {
                     hostState.showSnackbar(it.message)
                 }
@@ -34,25 +35,33 @@ fun SettingsScreen(
     BackHandler(enabled = true) {
         viewModel.onEvent(SettingsScreenEvent.BackPressed)
     }
-    Scaffold(snackbarHost = {SnackbarHost(hostState = hostState)}) {
-        Column(Modifier.fillMaxSize().padding(it),
-            verticalArrangement = Arrangement.Center
+    Scaffold(snackbarHost = { SnackbarHost(hostState = hostState) }) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.Center,
         ) {
             OutlinedTextField(
                 value = viewModel.state.ipAddress,
-                onValueChange = {string->
+                onValueChange = { string ->
                     viewModel.onEvent(SettingsScreenEvent.ipAddressChanged(string))
                 },
                 label = {
                     Text(text = "IP Address")
                 },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number
+                ),
+                singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
             )
+            Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 value = viewModel.state.port,
-                onValueChange = {string->
+                onValueChange = { string ->
                     viewModel.onEvent(SettingsScreenEvent.portChanged(string))
                 },
                 label = {
@@ -61,12 +70,15 @@ fun SettingsScreen(
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number
                 ),
+                singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
             )
-            Button(onClick = {viewModel.onEvent(SettingsScreenEvent.onSaveButtonClicked)}) {
-                Text(text = "Save")
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Button(onClick = { viewModel.onEvent(SettingsScreenEvent.onSaveButtonClicked) }) {
+                    Text(text = "Save")
+                }
             }
         }
     }
