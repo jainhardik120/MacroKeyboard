@@ -76,11 +76,16 @@ fun SettingsScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                OutlinedButton(onClick = {
+                    viewModel.onEvent(SettingsScreenEvent.OnCancelButtonClicked)
+                }) {
+                    Text(text = "Cancel")
+                }
+                Spacer(modifier = Modifier.width(8.dp))
                 Button(onClick = { viewModel.onEvent(SettingsScreenEvent.onSaveButtonClicked) }) {
                     Text(text = "Save")
                 }
             }
         }
     }
-
 }

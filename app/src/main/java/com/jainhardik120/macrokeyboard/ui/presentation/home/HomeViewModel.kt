@@ -116,7 +116,6 @@ class HomeViewModel @Inject constructor(
                     )
                 )
             }
-
             is HomeScreenEvent.CloseClicked -> {
                 if (!state.connectedState) {
                     openConnection()
@@ -141,11 +140,13 @@ class HomeViewModel @Inject constructor(
                         array.put(jsonObject)
                     }
                     withContext(Dispatchers.IO) {
-                        try {
-                            printWriter.print(array)
-                            printWriter.flush()
-                        } catch (e: Exception) {
-                            sendUiEvent(UiEvent.ShowSnackbar(e.message ?: "Unknown Error"))
+                        if(state.connectedState){
+                            try {
+                                printWriter.print(array)
+                                printWriter.flush()
+                            } catch (e: Exception) {
+                                sendUiEvent(UiEvent.ShowSnackbar(e.message ?: "Unknown Error"))
+                            }
                         }
                     }
                 }

@@ -19,6 +19,29 @@ class MacroRepositoryImpl @Inject constructor(
     private val TAG = "MacroRepositoryDebug"
     private val dao = db.dao
 
+
+    override fun isDarkSetting(): Boolean {
+        return sharedPreferences.getBoolean("DarkMode", true)
+    }
+
+    override fun isDynamicColors(): Boolean {
+        return sharedPreferences.getBoolean("DynamicColors", false)
+    }
+
+    override fun updateDarkSetting(value: Boolean) {
+        with(sharedPreferences.edit()){
+            putBoolean("DarkMode", value)
+            apply()
+        }
+    }
+
+    override fun updateDynamicColors(value: Boolean) {
+        with(sharedPreferences.edit()){
+            putBoolean("DynamicColors", value)
+            apply()
+        }
+    }
+
     override fun getScreen(id: Int): Flow<List<ScreenEntity>> {
         return dao.getScreenInfo(id)
     }

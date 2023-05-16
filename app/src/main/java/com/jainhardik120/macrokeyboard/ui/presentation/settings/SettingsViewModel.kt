@@ -30,7 +30,7 @@ class SettingsViewModel @Inject constructor(
 
     init {
         val pair = repository.getConnectionInfo()
-        state = state.copy(ipAddress = pair.first, port = pair.second.toString())
+        state = state.copy(ipAddress = pair.first, port = pair.second.toString(), darkMode = repository.isDarkSetting(), dynamicColors = repository.isDynamicColors())
     }
 
     fun onEvent(event: SettingsScreenEvent){
@@ -42,6 +42,8 @@ class SettingsViewModel @Inject constructor(
                 state = state.copy(port = event.port)
             }
             is SettingsScreenEvent.onSaveButtonClicked->{
+                repository.updateDarkSetting(state.darkMode)
+                repository.updateDynamicColors(state.dynamicColors)
                 if(state.ipAddress.isNotEmpty() && state.port.isNotEmpty()){
                     repository.updatePortInfo(Pair(state.ipAddress, state.port.toInt()))
                     sendUiEvent(UiEvent.Navigate())
@@ -54,9 +56,20 @@ class SettingsViewModel @Inject constructor(
                         sendUiEvent(UiEvent.ShowSnackbar("Enter IP Address"))
                     }
                 }
-
             }
-            else -> {}
+            SettingsScreenEvent.BackPressed -> {
+                sendUiEvent(UiEvent.Navigate())
+            }
+            SettingsScreenEvent.OnCancelButtonClicked -> {
+                sendUiEvent(UiEvent.Navigate())
+            }
+
+            is SettingsScreenEvent.DarkModeToggled -> {
+                state = state.copy(darkMode = event.value)
+            }
+            is SettingsScreenEvent.DynamicColorsToggled -> {
+                state = state.copy(dynamicColors = event.value)
+            }
         }
     }
 }

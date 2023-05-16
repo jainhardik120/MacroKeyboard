@@ -12,6 +12,14 @@ interface MacroRepository {
 
      fun getScreen(id: Int) : Flow<List<ScreenEntity>>
 
+     fun isDarkSetting() : Boolean
+
+     fun isDynamicColors() : Boolean
+
+     fun updateDarkSetting(value: Boolean)
+
+     fun updateDynamicColors(value: Boolean)
+
     fun getConnectionInfo():Pair<String, Int>
 
     fun updatePortInfo(updatedValues: Pair<String, Int>)

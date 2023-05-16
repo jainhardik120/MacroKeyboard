@@ -6,12 +6,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
 import com.jainhardik120.macrokeyboard.ui.presentation.action.ActionEditScreen
 import com.jainhardik120.macrokeyboard.ui.presentation.edit.EditButtonScreen
 import com.jainhardik120.macrokeyboard.ui.presentation.home.HomeScreen
@@ -19,15 +24,20 @@ import com.jainhardik120.macrokeyboard.ui.presentation.settings.SettingsScreen
 import com.jainhardik120.macrokeyboard.ui.theme.MacroKeyboardTheme
 import com.jainhardik120.macrokeyboard.util.Screen
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
+
+    @Inject lateinit var repository : MacroRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         setContent {
-            MacroKeyboardTheme {
-                // A surface container using the 'background' color from the theme
+            MacroKeyboardTheme(
+                darkTheme = repository.isDarkSetting(),
+                useDynamicColors = repository.isDynamicColors()
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -82,7 +92,6 @@ class MainActivity : ComponentActivity() {
                             )) {
                                 ActionEditScreen(onNavigate = {navController.navigateUp()})
                         }
-
                     }
                 }
             }

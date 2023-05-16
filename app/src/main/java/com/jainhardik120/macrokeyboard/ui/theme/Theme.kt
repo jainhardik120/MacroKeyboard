@@ -79,9 +79,9 @@ private val LightColorPalette = lightColorScheme(
 @Composable
 fun MacroKeyboardTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    useDynamicColors: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
     content: @Composable () -> Unit
 ) {
-    val useDynamicColors = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     val colors = when {
         useDynamicColors && darkTheme -> dynamicDarkColorScheme(LocalContext.current)
         useDynamicColors && !darkTheme -> dynamicLightColorScheme(LocalContext.current)
@@ -93,10 +93,10 @@ fun MacroKeyboardTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colors.background.toArgb()
+            window.navigationBarColor= colors.background.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
-
     MaterialTheme(
         colorScheme = colors,
         typography = Typography,

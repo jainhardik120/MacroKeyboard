@@ -71,7 +71,7 @@ fun EditButtonScreen(
                         Text(text = "Create")
                     }
                 }
-                Button(onClick = {viewModel.onEvent(EditButtonScreenEvent.DeleteClicked)}){
+                OutlinedButton(onClick = {viewModel.onEvent(EditButtonScreenEvent.DeleteClicked)}){
                     if(state.newButton){
                         Text(text = "Cancel")
                     }else{
