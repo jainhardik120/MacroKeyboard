@@ -156,7 +156,6 @@ class EditScreenViewModel @Inject constructor(
                             }
                             repository.deleteButton(state.childId.toInt())
                             sendUiEvent(UiEvent.Navigate())
-
                         }
                     }
                 }

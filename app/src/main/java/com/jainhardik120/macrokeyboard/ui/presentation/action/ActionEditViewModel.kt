@@ -8,7 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jainhardik120.macrokeyboard.data.local.entity.ActionEntity
 import com.jainhardik120.macrokeyboard.domain.repository.MacroRepository
+import com.jainhardik120.macrokeyboard.util.Actions
 import com.jainhardik120.macrokeyboard.util.UiEvent
+import com.jainhardik120.macrokeyboard.util.actionFromJson
 import com.jainhardik120.macrokeyboard.util.keyMaps
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -19,8 +21,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.json.JSONArray
-import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,6 +36,7 @@ class ActionEditViewModel @Inject constructor(
     val searchText = _searchText.asStateFlow()
 
     private val _searchResults = MutableStateFlow(map.keys.toList())
+
     val searchResult = searchText.combine(_searchResults) { text, results ->
         if (text.isBlank()) {
             results
@@ -54,14 +55,14 @@ class ActionEditViewModel @Inject constructor(
     }
 
     fun onKeyItemSelected(text:String){
-        val newList = List(state.keyComboArray.size+1){
-            if(it<state.keyComboArray.size){
-                state.keyComboArray[it]
+        val newList = List((state.action as Actions.KeyCombos).combos.size+1){
+            if(it<(state.action as Actions.KeyCombos).combos.size){
+                (state.action as Actions.KeyCombos).combos[it]
             }else{
                 Pair(map[text]?:0, text)
             }
         }
-        state = state.copy(keyComboArray = newList)
+        state = state.copy(action = Actions.KeyCombos(combos = newList))
     }
 
     private fun sendUiEvent(event: UiEvent) {
@@ -76,41 +77,13 @@ class ActionEditViewModel @Inject constructor(
             val sno = savedStateHandle.get<String>("sno")!!
             val childId = savedStateHandle.get<String>("childId")!!
             val initData = repository.getAction(childId.toInt(), sno.toInt())
-            state = if (initData == null) {
-                state.copy(id = childId.toInt(), sno = sno.toInt(), actionType = 1, stringData = "", isNewAction = true)
+            if (initData == null) {
+                state = state.copy(id = childId.toInt(), sno = sno.toInt(), isNewAction = true)
             } else {
-                val jsonObject = JSONObject(initData.data)
-                when (initData.type) {
-                    1 -> {
-                        state = state.copy(stringData = jsonObject.getString("string"))
-                    }
-
-                    2 -> {
-                        val array = jsonObject.getJSONArray("keys")
-                        val list = List(array.length()) {
-                            val keyName = array.getJSONObject(it).getString("keyName") ?: ""
-                            Pair(map[keyName] ?: 0, keyName)
-                        }
-                        state = state.copy(keyComboArray = list)
-                    }
-
-                    3 -> {
-                        state = state.copy(
-                            xCoordinate = jsonObject.getInt("x").toString(),
-                            yCoordinate = jsonObject.getInt("y").toString()
-                        )
-                    }
-
-                    4 -> {
-                        state = state.copy(mouseButton = jsonObject.getString("button"))
-                    }
-
-                    5 -> {
-                        state =
-                            state.copy(delayMilliSeconds = jsonObject.getInt("delay").toString())
-                    }
+                val action = actionFromJson(initData.type, initData.data)
+                if(action!=null){
+                    state = state.copy(id = childId.toInt(), sno = sno.toInt(), action = action)
                 }
-                state.copy(id = childId.toInt(), sno = sno.toInt(), actionType = initData.type)
             }
         }
     }
@@ -119,42 +92,12 @@ class ActionEditViewModel @Inject constructor(
         when (event) {
             is ActionEditScreenEvent.ButtonSaveClicked -> {
                 viewModelScope.launch {
-                    val jsonObject = JSONObject()
-                    when (state.actionType) {
-                        1 -> {
-                            jsonObject.put("string", state.stringData)
-                        }
-
-                        2 -> {
-                            val jsonArray = JSONArray()
-                            for (i in state.keyComboArray) {
-                                val tempObject = JSONObject()
-                                tempObject.put("key", i.first)
-                                tempObject.put("keyName", i.second)
-                                jsonArray.put(tempObject)
-                            }
-                            jsonObject.put("keys", jsonArray)
-                        }
-
-                        3 -> {
-                            jsonObject.put("x", state.xCoordinate.toInt())
-                            jsonObject.put("y", state.yCoordinate.toInt())
-                        }
-
-                        4 -> {
-
-                        }
-
-                        5 -> {
-                            jsonObject.put("delay", state.delayMilliSeconds.toInt())
-                        }
-                    }
                     repository.addAction(
                         ActionEntity(
                             state.id,
                             state.sno,
-                            state.actionType,
-                            jsonObject.toString()
+                            state.action.actionTypeCode(),
+                            state.action.toJsonString()
                         )
                     )
                     sendUiEvent(UiEvent.Navigate())
@@ -162,15 +105,11 @@ class ActionEditViewModel @Inject constructor(
             }
 
             is ActionEditScreenEvent.StringActionDataChanged -> {
-                state = state.copy(stringData = event.string)
+                state = state.copy(action = Actions.StringInput(event.string))
             }
 
             is ActionEditScreenEvent.ActionTypeChanged -> {
-                state = if (event.string.isNotEmpty()) {
-                    state.copy(actionType = event.string.toInt())
-                } else {
-                    state.copy(actionType = -1)
-                }
+                state = state.copy(action = event.action)
             }
 
             is ActionEditScreenEvent.BackPressed -> {
@@ -180,19 +119,19 @@ class ActionEditViewModel @Inject constructor(
             }
 
             is ActionEditScreenEvent.MouseXChanged -> {
-                state = state.copy(xCoordinate = event.x)
+                state = state.copy(action = Actions.MouseMove(x = event.x.toInt(), y = (state.action as Actions.MouseMove).y))
             }
 
             is ActionEditScreenEvent.MouseYChanged -> {
-                state = state.copy(yCoordinate = event.y)
+                state = state.copy(action = Actions.MouseMove(y = event.y.toInt(), x = (state.action as Actions.MouseMove).x))
             }
 
             is ActionEditScreenEvent.DelayChanged -> {
-                state = state.copy(delayMilliSeconds = event.delay)
+                state = state.copy(action = Actions.Delay(delay = event.delay.toInt()))
             }
 
             is ActionEditScreenEvent.MouseKeyChanged -> {
-                state = state.copy(mouseButton = event.key)
+                state = state.copy(action = Actions.MouseClick(event.key.toInt()))
             }
         }
     }

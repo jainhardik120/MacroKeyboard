@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jainhardik120.macrokeyboard.util.Actions
 import com.jainhardik120.macrokeyboard.util.UiEvent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -26,7 +27,7 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
     val state = viewModel.state
     val hostState = remember { SnackbarHostState() }
     var expanded by remember { mutableStateOf(false) }
-    val list = listOf("String Input", "Key Combo", "Mouse Move", "Mouse Click", "Delay")
+    val list = listOf(Actions.StringInput(), Actions.KeyCombos(), Actions.MouseMove(), Actions.MouseClick(), Actions.Delay())
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect {
             when (it) {
@@ -53,7 +54,7 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }) {
                 OutlinedTextField(
-                    value = list[state.actionType - 1],
+                    value = state.action.typeName(),
                     onValueChange = {
 
                     },
@@ -69,9 +70,9 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                 }) {
                     list.forEachIndexed { index, s ->
                         DropdownMenuItem(
-                            text = { Text(text = s) },
+                            text = { Text(text = s.typeName()) },
                             onClick = {
-                                viewModel.onEvent(ActionEditScreenEvent.ActionTypeChanged((index + 1).toString()))
+                                viewModel.onEvent(ActionEditScreenEvent.ActionTypeChanged(s))
                                 expanded = false
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
@@ -85,10 +86,10 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
             }) {
                 Text(text = "Save")
             }
-            when (state.actionType) {
-                1 -> {
+            when (state.action) {
+                is Actions.StringInput -> {
                     OutlinedTextField(
-                        value = state.stringData,
+                        value = state.action.string,
                         onValueChange = { string ->
                             viewModel.onEvent(
                                 ActionEditScreenEvent.StringActionDataChanged(string)
@@ -102,11 +103,11 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                             .padding(16.dp)
                     )
                 }
-                2 -> {
+                is Actions.KeyCombos -> {
                     val searchText by viewModel.searchText.collectAsState()
                     val searchResults by viewModel.searchResult.collectAsState()
                     FlowRow(Modifier.fillMaxWidth()) {
-                        for (i in state.keyComboArray){
+                        for (i in state.action.combos){
                             InputChip(selected = false, onClick = {
 
                             }, label = {
@@ -119,7 +120,7 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                     Column {
                         TextField(value = searchText, onValueChange = viewModel::onSearchTextChanged)
                         LazyColumn(content = {
-                            itemsIndexed(searchResults){index, item ->  
+                            itemsIndexed(searchResults){_, item ->
                                 Text(text = item, modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 16.dp)
@@ -130,23 +131,23 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                         })
                     }
                 }
-                3 -> {
+                is Actions.MouseMove -> {
                     Row {
-                        OutlinedTextField(value = state.xCoordinate, onValueChange = {string->
+                        OutlinedTextField(value = state.action.x.toString(), onValueChange = {string->
                             viewModel.onEvent(ActionEditScreenEvent.MouseXChanged(string))
                         })
                         Spacer(modifier = Modifier.width(8.dp))
-                        OutlinedTextField(value = state.yCoordinate, onValueChange = {string->
+                        OutlinedTextField(value = state.action.y.toString(), onValueChange = {string->
                             viewModel.onEvent(ActionEditScreenEvent.MouseYChanged(string))
                         })
                     }
                 }
-                4 -> {
+                is Actions.MouseClick -> {
 
                 }
-                5 -> {
+                is Actions.Delay -> {
                     OutlinedTextField(
-                        value = state.delayMilliSeconds,
+                        value = state.action.delay.toString(),
                         onValueChange = { string ->
                             viewModel.onEvent(
                                 ActionEditScreenEvent.DelayChanged(string)
@@ -159,10 +160,6 @@ fun ActionEditScreen(onNavigate: () -> Unit, viewModel: ActionEditViewModel = hi
                             .fillMaxWidth()
                             .padding(16.dp)
                     )
-                }
-
-                else -> {
-
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
