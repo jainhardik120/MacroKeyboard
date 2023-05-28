@@ -6,22 +6,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include"json.hpp"
+#include "json.hpp"
 
 using json = nlohmann::json;
-#pragma comment (lib, "Ws2_32.lib")
+#pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
-void sendKeyboardStringInput(std::string data){
+void sendKeyboardStringInput(std::string data)
+{
     auto json = json::parse(data);
     std::string input = json["string"];
-    const wchar_t* keys = new wchar_t[input.length() + 1];
-    mbstowcs((wchar_t*)keys, input.c_str(), input.length() + 1);
+    const wchar_t *keys = new wchar_t[input.length() + 1];
+    mbstowcs((wchar_t *)keys, input.c_str(), input.length() + 1);
 
-    INPUT* inputBuffer = new INPUT[input.length() * 2];
+    INPUT *inputBuffer = new INPUT[input.length() * 2];
     ZeroMemory(inputBuffer, sizeof(INPUT) * input.length() * 2);
+
 
     int inputIndex = 0;
     for (int i = 0; i < input.length(); i++)
@@ -44,7 +46,8 @@ void sendKeyboardStringInput(std::string data){
     delete[] inputBuffer;
 }
 
-void moveMouse(std::string data){
+void moveMouse(std::string data)
+{
     auto json = json::parse(data);
     int x = json["x"];
     int y = json["y"];
@@ -61,43 +64,48 @@ void moveMouse(std::string data){
     SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
 }
 
-void mouseButtonClick(std::string key){
-
+void mouseButtonClick(std::string key)
+{
 }
 
-void keyComboArr(WORD* keys,int n){
-    INPUT* inputs = new INPUT[2*n];
-    ZeroMemory(inputs, sizeof(INPUT)*2*n);
+void keyComboArr(WORD *keys, int n)
+{
+    INPUT *inputs = new INPUT[2 * n];
+    ZeroMemory(inputs, sizeof(INPUT) * 2 * n);
     for (int i = 0; i < n; i++)
     {
         inputs[i].type = INPUT_KEYBOARD;
         inputs[i].ki.wVk = keys[i];
-        inputs[2*n-i-1].type = INPUT_KEYBOARD;
-        inputs[2*n-i-1].ki.wVk = keys[i];
-        inputs[2*n-i-1].ki.dwFlags = KEYEVENTF_KEYUP;
+        inputs[2 * n - i - 1].type = INPUT_KEYBOARD;
+        inputs[2 * n - i - 1].ki.wVk = keys[i];
+        inputs[2 * n - i - 1].ki.dwFlags = KEYEVENTF_KEYUP;
     }
-    SendInput(2*n, inputs ,sizeof(INPUT));
+    SendInput(2 * n, inputs, sizeof(INPUT));
     delete[] inputs;
 }
 
-void keyCombosPress(std::string data){
+void keyCombosPress(std::string data)
+{
     auto objectJson = json::parse(data);
     auto json = objectJson["keys"];
-    WORD* keys = new WORD[json.size()];
-    for(int i = 0; i<json.size(); i++){
+    WORD *keys = new WORD[json.size()];
+    for (int i = 0; i < json.size(); i++)
+    {
         keys[i] = json[i]["key"];
     }
     keyComboArr(keys, json.size());
     delete[] keys;
 }
 
-void delayMillis(std::string data){
+void delayMillis(std::string data)
+{
     auto json = json::parse(data);
     int delay = json["delay"];
     Sleep(delay);
 }
 
-void handlePress(char* buff, int len){
+void handlePress(char *buff, int len)
+{
     std::cout << buff << std::endl;
     auto json = json::parse(buff);
     for (int i = 0; i < json.size(); i++)
@@ -127,7 +135,7 @@ void handlePress(char* buff, int len){
     }
 }
 
-int main(void) 
+int main(void)
 {
     WSADATA wsaData;
     int iResult;
@@ -141,9 +149,10 @@ int main(void)
     int iSendResult;
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
-    
-    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != 0) {
+
+    iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0)
+    {
         printf("WSAStartup failed with error: %d\n", iResult);
         return 1;
     }
@@ -155,22 +164,25 @@ int main(void)
     hints.ai_flags = AI_PASSIVE;
 
     iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
-    if ( iResult != 0 ) {
+    if (iResult != 0)
+    {
         printf("getaddrinfo failed with error: %d\n", iResult);
         WSACleanup();
         return 1;
     }
 
     ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET) {
+    if (ListenSocket == INVALID_SOCKET)
+    {
         printf("socket failed with error: %ld\n", WSAGetLastError());
         freeaddrinfo(result);
         WSACleanup();
         return 1;
     }
-    
-    iResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
+
+    iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+    if (iResult == SOCKET_ERROR)
+    {
         printf("bind failed with error: %d\n", WSAGetLastError());
         freeaddrinfo(result);
         closesocket(ListenSocket);
@@ -180,53 +192,61 @@ int main(void)
 
     freeaddrinfo(result);
 
-    iResult = listen(ListenSocket, SOMAXCONN);
-    if (iResult == SOCKET_ERROR) {
-        printf("listen failed with error: %d\n", WSAGetLastError());
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
-
-
-    printf("Waiting for connections...\n");
-
-    ClientSocket = accept(ListenSocket, NULL, NULL);
-    if (ClientSocket == INVALID_SOCKET) {
-        printf("accept failed with error: %d\n", WSAGetLastError());
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
-
-    printf("Connected...\n");
-    closesocket(ListenSocket);
-
-    do {
-        ZeroMemory(recvbuf, sizeof(recvbuf));
-        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-        if (iResult > 0) {
-            handlePress(recvbuf, iResult);
+    while (1)
+    {
+        iResult = listen(ListenSocket, SOMAXCONN);
+        if (iResult == SOCKET_ERROR)
+        {
+            printf("listen failed with error: %d\n", WSAGetLastError());
+            closesocket(ListenSocket);
+            WSACleanup();
+            return 1;
         }
-        else if (iResult == 0)
-            printf("Connection closing...\n");
-        else  {
-            printf("recv failed with error: %d\n", WSAGetLastError());
+        printf("Waiting for connections...\n");
+
+        ClientSocket = accept(ListenSocket, NULL, NULL);
+        if (ClientSocket == INVALID_SOCKET)
+        {
+            printf("accept failed with error: %d\n", WSAGetLastError());
+            closesocket(ListenSocket);
+            WSACleanup();
+            return 1;
+        }
+
+        printf("Connected...\n");
+
+        do
+        {
+            ZeroMemory(recvbuf, sizeof(recvbuf));
+            iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+            if (iResult > 0)
+            {
+                handlePress(recvbuf, iResult);
+            }
+            else if (iResult == 0)
+            {
+                printf("Connection closing...\n");
+            }
+            else
+            {
+                printf("recv failed with error: %d\n", WSAGetLastError());
+                closesocket(ClientSocket);
+                WSACleanup();
+                return 1;
+            }
+        } while (iResult > 0);
+
+        iResult = shutdown(ClientSocket, SD_SEND);
+        if (iResult == SOCKET_ERROR)
+        {
+            printf("shutdown failed with error: %d\n", WSAGetLastError());
             closesocket(ClientSocket);
             WSACleanup();
             return 1;
         }
-    } while (iResult > 0);
-
-    iResult = shutdown(ClientSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
         closesocket(ClientSocket);
-        WSACleanup();
-        return 1;
     }
-
-    closesocket(ClientSocket);
+    closesocket(ListenSocket);
     WSACleanup();
     return 0;
 }
