@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Macro Keyboard"
-include ':app'
+include(":app")

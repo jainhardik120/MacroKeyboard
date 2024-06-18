@@ -7,12 +7,37 @@
 #include <stdio.h>
 #include <iostream>
 #include "json.hpp"
+#include <thread> // Include the thread header
 
 using json = nlohmann::json;
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
+
+#define BROADCAST_INTERVAL_MS 5000 // Broadcast interval in milliseconds
+
+// void broadcastPCInfo(SOCKET broadcastSocket)
+// {
+//     while (true)
+//     {
+//         std::cout << "Sending Information\n";
+//         // Create packet containing PC information (e.g., IP address and unique identifier)
+//         std::string pcInfoPacket = "PC_INFO";
+
+//         // Broadcast packet to all devices on the local network
+//         sockaddr_in broadcastAddr;
+//         broadcastAddr.sin_family = AF_INET;
+//         broadcastAddr.sin_port = htons(atoi(DEFAULT_PORT));
+//         broadcastAddr.sin_addr.s_addr = INADDR_BROADCAST;
+
+//         int broadcastAddrLen = sizeof(broadcastAddr);
+//         sendto(broadcastSocket, pcInfoPacket.c_str(), pcInfoPacket.length(), 0, (sockaddr *)&broadcastAddr, broadcastAddrLen);
+
+//         // Wait for the next broadcast interval
+//         Sleep(BROADCAST_INTERVAL_MS);
+//     }
+// }
 
 void sendKeyboardStringInput(std::string data)
 {
@@ -23,7 +48,6 @@ void sendKeyboardStringInput(std::string data)
 
     INPUT *inputBuffer = new INPUT[input.length() * 2];
     ZeroMemory(inputBuffer, sizeof(INPUT) * input.length() * 2);
-
 
     int inputIndex = 0;
     for (int i = 0; i < input.length(); i++)
@@ -156,6 +180,27 @@ int main(void)
         printf("WSAStartup failed with error: %d\n", iResult);
         return 1;
     }
+
+    // SOCKET broadcastSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    // if (broadcastSocket == INVALID_SOCKET)
+    // {
+    //     std::cerr << "socket failed with error: " << WSAGetLastError() << std::endl;
+    //     WSACleanup();
+    //     return 1;
+    // }
+
+    // // Enable broadcast option for the socket
+    // BOOL broadcastOption = TRUE;
+    // if (setsockopt(broadcastSocket, SOL_SOCKET, SO_BROADCAST, (const char *)&broadcastOption, sizeof(BOOL)) == SOCKET_ERROR)
+    // {
+    //     std::cerr << "setsockopt failed with error: " << WSAGetLastError() << std::endl;
+    //     closesocket(broadcastSocket);
+    //     WSACleanup();
+    //     return 1;
+    // }
+
+    // // Create a new thread for broadcasting
+    // std::thread broadcastThread(broadcastPCInfo, broadcastSocket);
 
     ZeroMemory(&hints, sizeof(hints));
     hints.ai_family = AF_INET;
